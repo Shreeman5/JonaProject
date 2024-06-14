@@ -1,0 +1,31 @@
+organism,ncbi_taxon_id,weight,feature
+Mediterraneibacter gnavus,33038,0.8307,novalue
+Escherichia coli,562,0.6459,value
+Faecalibacterium prausnitzii,853,-0.4431,novalue
+Faecalibacterium,216851,-0.2962,value
+Anaerostipes,207244,-0.29,value
+[Clostridium] leptum,1535,-0.2881,value
+Christensenellaceae,990719,-0.2697,novalue
+Fusobacterium,848,0.2697,novalue
+Dialister invisus,218538,-0.2261,novalue
+Enterocloster clostridioformis,1531,0.226,novalue
+Oscillibacter,459786,-0.2193,value
+Roseburia hominis,301301,-0.2192,novalue
+Bacteroides uniformis,820,-0.1793,value
+Escherichia,561,0.1743,novalue
+Enterococcus,1350,0.1705,value
+Ruminococcus,1263,-0.1649,novalue
+Peptostreptococcaceae,186804,-0.1646,novalue
+Anaerostipes hadrus,649756,-0.1639,value
+Collinsella,102106,-0.1522,value
+Methanobrevibacter,2172,-0.1522,novalue
+Aggregatibacter segnis,739,0.1481,novalue
+Actinobacillus,713,0.1481,novalue
+Streptococcus anginosus,1328,0.1481,novalue
+Fusicatenibacter,1407607,-0.1445,novalue
+Fusicatenibacter saccharivorans,1150298,-0.1417,novalue
+Oscillospiraceae,216572,-0.1347,novalue
+Turicibacter,191303,-0.1343,novalue
+Gemmiger,204475,-0.1343,novalue
+Haemophilus,724,0.1277,value
+Parabacteroides distasonis,823,-0.1268,value

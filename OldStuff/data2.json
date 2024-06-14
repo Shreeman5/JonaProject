@@ -1,0 +1,23 @@
+{
+    "name": "root",
+    "children": [
+        { "name": "A", "value": 100 },
+        { "name": "B", "value": 50 },
+        {
+            "name": "C",
+            "children": [
+                { "name": "D", "value": 30 },
+                { "name": "E", "value": 20 },
+                {
+                    "name": "F",
+                    "children": [
+                        { "name": "G", "value": 10 },
+                        { "name": "H", "value": 5 },
+                        { "name": "I", "value": 15 },
+                        { "name": "J", "value": 10 }
+                    ]
+                }
+            ]
+        }
+    ]
+}

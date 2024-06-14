@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>D3 Hierarchical Layout</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+
+        .outer-square {
+            position: relative;
+            width: 300px;
+            height: 300px;
+            background-color: lightblue;
+        }
+
+        .inner-square {
+            position: absolute;
+            width: 150px;
+            height: 150px;
+            background-color: lightcoral;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .item {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            background-color: lightgreen;
+        }
+    </style>
+</head>
+<body>
+    <div id="container"></div>
+
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const width = 300;
+            const height = 300;
+            const innerSize = 150;
+
+            // Sample JSON data
+            const data = {
+                "name": "root",
+                "children": [
+                    { "name": "A", "value": 100 },
+                    { "name": "B", "value": 50 },
+                    {
+                        "name": "C",
+                        "children": [
+                            { "name": "D", "value": 30 },
+                            { "name": "E", "value": 20 },
+                            {
+                                "name": "F",
+                                "children": [
+                                    { "name": "G", "value": 10 },
+                                    { "name": "H", "value": 5 },
+                                    { "name": "I", "value": 15 },
+                                    { "name": "J", "value": 10 },
+                                    {
+                                        "name": "K",
+                                        "children": [
+                                            { "name": "L", "value": 5 },
+                                            { "name": "M", "value": 5 },
+                                            { "name": "N", "value": 5 },
+                                            { "name": "O", "value": 5 },
+                                            { "name": "P", "value": 5 }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "name": "Q",
+                        "children": [
+                            { "name": "R", "value": 25 },
+                            { "name": "S", "value": 25 },
+                            {
+                                "name": "T",
+                                "children": [
+                                    { "name": "U", "value": 20 },
+                                    { "name": "V", "value": 10 },
+                                    { "name": "W", "value": 5 },
+                                    { "name": "X", "value": 5 },
+                                    {
+                                        "name": "Y",
+                                        "children": [
+                                            { "name": "Z", "value": 5 },
+                                            { "name": "AA", "value": 5 },
+                                            { "name": "BB", "value": 5 },
+                                            { "name": "CC", "value": 5 },
+                                            { "name": "DD", "value": 5 }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "name": "EE",
+                        "children": [
+                            { "name": "FF", "value": 25 },
+                            { "name": "GG", "value": 25 },
+                            {
+                                "name": "HH",
+                                "children": [
+                                    { "name": "II", "value": 20 },
+                                    { "name": "JJ", "value": 10 },
+                                    { "name": "KK", "value": 5 },
+                                    { "name": "LL", "value": 5 },
+                                    {
+                                        "name": "MM",
+                                        "children": [
+                                            { "name": "NN", "value": 5 },
+                                            { "name": "OO", "value": 5 },
+                                            { "name": "PP", "value": 5 },
+                                            { "name": "QQ", "value": 5 },
+                                            { "name": "RR", "value": 5 }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+
+            // Create the SVG container
+            const svg = d3.select("#container")
+                .append("svg")
+                .attr("width", width)
+                .attr("height", height)
+                .style("background-color", "lightblue");
+
+            // Draw the inner square
+            svg.append("rect")
+                .attr("x", (width - innerSize) / 2)
+                .attr("y", (height - innerSize) / 2)
+                .attr("width", innerSize)
+                .attr("height", innerSize)
+                .attr("fill", "lightcoral");
+
+            const outerSize = width;
+            const padding = (outerSize - innerSize) / 2;
+
+            // Create a hierarchy from the data
+            const root = d3.hierarchy(data);
+
+            // Create a layout for the children nodes
+            const positions = [
+                { x: padding / 2, y: padding / 2 },
+                { x: padding / 2, y: outerSize / 2 - padding / 4 },
+                { x: padding / 2, y: outerSize - padding / 2 - 50 },
+                { x: outerSize / 2 - padding / 4, y: padding / 2 },
+                { x: outerSize / 2 - padding / 4, y: outerSize - padding / 2 - 50 },
+                { x: outerSize - padding / 2 - 50, y: padding / 2 },
+                { x: outerSize - padding / 2 - 50, y: outerSize / 2 - padding / 4 },
+                { x: outerSize - padding / 2 - 50, y: outerSize - padding / 2 - 50 },
+                { x: outerSize / 2 - padding / 4, y: outerSize / 2 - padding / 4 },
+                { x: padding / 2, y: outerSize / 2 - padding / 4 }
+            ];
+
+            // Append the children elements
+            root.children.forEach((child, index) => {
+                svg.append("rect")
+                    .attr("x", positions[index].x)
+                    .attr("y", positions[index].y)
+                    .attr("width", 50)
+                    .attr("height", 50)
+                    .attr("fill", "lightgreen");
+            });
+        });
+    </script>
+</body>
+</html>

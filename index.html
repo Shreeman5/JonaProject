@@ -1,0 +1,922 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Sunburst for ERR262943_Diarrhea_</title>
+    <script src="https://d3js.org/d3.v6.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .label {
+            font-size: 10px;
+            text-anchor: middle;
+            pointer-events: none;
+        }
+        .tooltip {
+            position: absolute;
+            background-color: black;
+            color: white;
+            padding: 10px; /* Increased padding */
+            border-radius: 5px;
+            visibility: hidden;
+            z-index: 10;
+            pointer-events: none; /* Ensures the tooltip does not interfere with mouse events */
+            font-size: 34px; /* Increased font size */
+        }
+        .svg-container {
+            position: absolute;
+            left: 0px;
+            top: 0px;
+        }
+        .svg-container-2 {
+            position: absolute;
+            left: 1000px;
+            top: 0px;
+        }
+        .svg-container-3 {
+            position: absolute;
+            left: 2000px;
+            top: 0px;
+        }
+        .svg-container-4 {
+            position: absolute;
+            left: 3000px;
+            top: 0px;
+        }
+        .svg-container-5 {
+            position: absolute;
+            left: 4000px;
+            top: 0px;
+        }
+        .svg-container-6 {
+            position: absolute;
+            left: 5000px;
+            top: 0px;
+        }
+        .svg-container-7 {
+            position: absolute;
+            left: 0px;
+            top: 1000px;
+        }
+        .svg-container-8 {
+            position: absolute;
+            left: 1000px;
+            top: 1000px;
+        }
+        .svg-container-9 {
+            position: absolute;
+            left: 2000px;
+            top: 1000px;
+        }
+        .svg-container-10 {
+            position: absolute;
+            left: 3000px;
+            top: 1000px;
+        }
+        .svg-container-11 {
+            position: absolute;
+            left: 4000px;
+            top: 1000px;
+        }
+        .svg-container-12 {
+            position: absolute;
+            left: 5000px;
+            top: 1000px;
+        }
+        .svg-container-13 {
+            position: absolute;
+            left: 0px;
+            top: 2000px;
+        }
+        .svg-container-14 {
+            position: absolute;
+            left: 1000px;
+            top: 2000px;
+        }
+        .svg-container-15 {
+            position: absolute;
+            left: 2000px;
+            top: 2000px;
+        }
+        .svg-container-16 {
+            position: absolute;
+            left: 3000px;
+            top: 2000px;
+        }
+        .svg-container-17 {
+            position: absolute;
+            left: 4000px;
+            top: 2000px;
+        }
+        .svg-container-18 {
+            position: absolute;
+            left: 5000px;
+            top: 2000px;
+        }
+    </style>
+</head>
+<body>
+    <!-- <h1>Sunburst for SRR6474279_Healthy</h1> -->
+    <div id="tooltip" class="tooltip"></div>
+    <div class="svg-container"></div>
+    <div class="svg-container-2"></div>
+    <div class="svg-container-3"></div>
+    <div class="svg-container-4"></div>
+    <div class="svg-container-5"></div>
+    <div class="svg-container-6"></div>
+    <div class="svg-container-7"></div>
+    <div class="svg-container-8"></div>
+    <div class="svg-container-9"></div>
+    <div class="svg-container-10"></div>
+    <div class="svg-container-11"></div>
+    <div class="svg-container-12"></div>
+    <div class="svg-container-13"></div>
+    <div class="svg-container-14"></div>
+    <div class="svg-container-15"></div>
+    <div class="svg-container-16"></div>
+    <div class="svg-container-17"></div>
+    <div class="svg-container-18"></div>
+
+    <script>
+        
+        let colorMapping = {}
+        d3.json("JSONswithStandardRanks/BetterIndivJSONfiles/ERR260506_Diarrhea.json").then(data => {
+            console.log(data)
+            const width = 1000;
+            const radius = width / 40;
+            const colorScale = d3.scaleOrdinal(d3.quantize(d3.interpolateRainbow, data.children.length + 1));
+            // console.log(colorScale)
+
+            const svg = d3.select(".svg-container")
+                .append("svg")
+                .attr("width", width)
+                .attr("height", 1000)
+                .append("g")
+                .attr("transform", `translate(${500},${500})`);
+
+            const partition = d3.partition()
+                .size([2 * Math.PI, radius]);
+
+            const root = d3.hierarchy(data)
+                .sum(d => d.value)
+                .sort((a, b) => b.value - a.value);
+
+            partition(root);
+
+            function innerRadius(d){
+                if (d.depth >= 9){
+                    return 346
+                }
+                else if (d.depth === 8){
+                    return 289
+                }
+                else if (d.depth === 7){
+                    return 237
+                }
+                else if (d.depth === 6){
+                    return 190
+                }
+                else if (d.depth === 5){
+                    return 148
+                }
+                else if (d.depth === 4){
+                    return 111
+                }
+                else if (d.depth === 3){
+                    return 79
+                }
+                else if (d.depth === 2){
+                    return 52
+                }
+                else if (d.depth === 1){
+                    return 30
+                }
+                return d.y0
+            }
+
+            function outerRadius(d){
+                if (d.depth >= 9){
+                    return 410
+                }
+                else if (d.depth === 8){
+                    if (!d.hasOwnProperty('children')){
+                        return 420
+                    }
+                    return 346
+                }
+                else if (d.depth === 7){
+                    if (!d.hasOwnProperty('children')){
+                        return 430
+                    }
+                    return 289
+                }
+                else if (d.depth === 6){
+                    if (!d.hasOwnProperty('children')){
+                        return 440
+                    }
+                    return 237
+                }
+                else if (d.depth === 5){
+                    if (!d.hasOwnProperty('children')){
+                        return 450
+                    }
+                    return 190
+                }
+                else if (d.depth === 4){
+                    if (!d.hasOwnProperty('children')){
+                        return 460
+                    }
+                    return 148
+                }
+                else if (d.depth === 3){
+                    if (!d.hasOwnProperty('children')){
+                        return 470
+                    }
+                    return 111
+                }
+                else if (d.depth === 2){
+                    if (!d.hasOwnProperty('children')){
+                        return 480
+                    }
+                    return 79
+                }
+                else if (d.depth === 1){
+                    if (!d.hasOwnProperty('children')){
+                        return 490
+                    }
+                    return 52
+                }
+                return d.y1
+            }
+
+            const arc = d3.arc()
+                .startAngle(d => d.x0)
+                .endAngle(d => d.x1)
+                .innerRadius(d => {
+                    return innerRadius(d)
+                })
+                .outerRadius(d => {
+                    return outerRadius(d)
+                });
+
+            function lightenColorByDegrees(rgbString, counter) {
+                var rgbValues = rgbString.match(/\d+/g).map(Number);
+                var basePercentage = 20;
+                var percentIncrease = basePercentage * counter;
+                var lightenedRgb = lightenColor(rgbValues, percentIncrease);
+                var lightenedRgbString = "rgb(" + lightenedRgb.join(", ") + ")";
+                return lightenedRgbString;
+            }
+
+            function lightenColor(rgb, percent) {
+                var r = rgb[0];
+                var g = rgb[1];
+                var b = rgb[2];
+                r = Math.min(Math.max(r + Math.round(2.55 * percent), 0), 255);
+                g = Math.min(Math.max(g + Math.round(2.55 * percent), 0), 255);
+                b = Math.min(Math.max(b + Math.round(2.55 * percent), 0), 255);
+                return [r, g, b];
+            }
+
+            const path = svg.selectAll("path")
+                .data(root.descendants().slice(1))
+                .enter()
+                .append("path")
+                .classed("sunburst-path", true) // Add a class to each path
+                .attr("id", (d, i) => "path-" + d.data.name) // Add a unique ID to each path
+                .attr("d", arc)
+                .style("stroke", "#fff")
+                .style("stroke-width", "1")
+                .attr("fill", d => {
+                    let counter = 0;
+                    let original = d
+                    while (d.depth > 1) {
+                        d = d.parent;
+                        counter = counter + 1;
+                    }
+                    let originalColor = colorScale(d.data.name);
+                    // console.log(originalColor)
+                    let lightenedColor = lightenColorByDegrees(originalColor, counter / 3.2);
+                    // console.log(original.data.name)
+                    // console.log(lightenedColor)
+                    colorMapping[original.data.name] = lightenedColor
+                    
+                    return lightenedColor;
+                })
+                .each(function(d) {
+                    d.originalStroke = "#fff"; 
+                    const pathSize = this.getTotalLength();
+                })
+                .on("click", click)
+                .on("mouseover", mouseover)
+                .on("mouseout", mouseout);
+
+
+
+            svg.append("circle")
+                .attr("r", radius*1.2)
+                .attr("class", "center")
+                .style("stroke", "black")
+                .style("stroke-width", 2)
+                .style("fill", "white")
+                .on("click", () => click(null, currentParent));
+
+            svg.append("text")
+                .attr("x", -162)
+                .attr("y", 470)
+                .attr("font-size", "28")
+                .attr("fill", "black")
+                .text("ERR260506_Diarrhea")
+
+
+            svg.append("defs")
+              .append("pattern")
+              .attr("id", "stripes")
+              .attr("patternUnits", "userSpaceOnUse")
+              .attr("width", 8)
+              .attr("height", 8)
+              .append("line")
+              .attr("x1", 0)
+              .attr("y1", 0)
+              .attr("x2", 8)
+              .attr("y2", 8)
+              .attr("stroke", "red")
+              .attr("stroke-width", 2);
+              
+
+            let currentParent = root;
+
+            let stripedArc = null; // Track the currently striped arc
+            let originalColors = {}; // Store original colors of arcs
+
+            function click(event, p) {
+                if (p.hasOwnProperty('children')) {
+                    currentParent = p.parent || root;
+
+                    root.each(d => d.target = {
+                        x0: Math.max(0, Math.min(1, (d.x0 - p.x0) / (p.x1 - p.x0))) * 2 * Math.PI,
+                        x1: Math.max(0, Math.min(1, (d.x1 - p.x0) / (p.x1 - p.x0))) * 2 * Math.PI,
+                        y0: Math.max(0, innerRadius(d) - p.depth),
+                        y1: Math.max(0, outerRadius(d) - p.depth)
+                    });
+
+                    const t = svg.transition().duration(750);
+
+                    path.transition(t)
+                        .tween("data", d => {
+                            const i = d3.interpolate(d.current, d.target);
+                            return t => d.current = i(t);
+                        })
+                        .attrTween("d", d => () => arc(d.current));
+
+                    // Restore original color of the previously striped arc
+                    if (stripedArc) {
+                        d3.select(stripedArc).attr("fill", originalColors[stripedArc.id]);
+                    }
+
+                    // Store original color of the clicked arc
+                    originalColors[event.target.id] = event.target.getAttribute("fill");
+
+                    // Apply striped pattern to the clicked arc
+                    d3.select(event.target)
+                        .attr("fill", "url(#stripes)");
+
+                    // Update the currently striped arc
+                    stripedArc = event.target;
+                }
+            }
+
+            function nameMapping(val){
+                if (val === 's'){
+                    return "species"
+                }
+                else if (val === 'st'){
+                    return "strain"
+                }
+                else if (val === 'g'){
+                    return "genus"
+                }
+                else if (val === 'n'){
+                    return "no rank"
+                }
+                else if (val === 'f'){
+                    return "family"
+                }
+                else if (val === 'o'){
+                    return "order"
+                }
+                else if (val === 'c'){
+                    return "class"
+                }
+                else if (val === 'sus'){
+                    return "subspecies"
+                }
+                else if (val === 'cl'){
+                    return "clade"
+                }
+                else if (val === 'p'){
+                    return "phylum"
+                }
+                else if (val === 'sgr'){
+                    return "species group"
+                }
+                else if (val === 'set'){
+                    return "serotype"
+                }
+                else if (val === 'sk'){
+                    return "superkingdom"
+                }
+                return ""
+            }
+
+            // Function to handle mouseover event
+            function mouseover(event, p) {
+                // Get the ID of the hovered path
+                const hoveredPathId = "path-" + p.data.name;
+
+                // Select all paths with the same ID across all sunbursts
+                d3.selectAll(".sunburst-path")
+                    .filter(function(d) {
+                        // Check if the current path is the hovered path or one of its descendants
+                        return this.id === hoveredPathId || d.ancestors().some(ancestor => ancestor.data.name === p.data.name);
+                    })
+                    .style("stroke", "red")
+                    .style("stroke-width", 5);
+
+                if (p.hasOwnProperty('children')){
+                    // console.log(p)
+                    let myVal = (p.value * 100).toFixed(2) + '%'
+                    let myVar = p.data.name
+                    let myNames = myVar.split("__")
+                    let index = myVar.indexOf("_")
+                    let substringBeforeUnderscore = ''
+                    if (index !== -1) {
+                        substringBeforeUnderscore = nameMapping(myVar.substring(0, index));
+                    } 
+                    let mytext = 'Name : ' + myNames[1] + "<br>" +
+                                    'Abundance : ' + myVal+ "<br>" + 
+                                    'Rank : ' + substringBeforeUnderscore + "<br>" +
+                                    'NCBI Taxon ID: ' + myNames[2] + "<br>"
+
+                    tooltip.innerHTML = mytext
+                    tooltip.style.left = `${event.pageX + 5}px`; // Position tooltip next to the mouse pointer
+                    tooltip.style.top = `${event.pageY + 5}px`;
+                    tooltip.style.visibility = 'visible';
+                }
+                else{
+                    const tooltip = document.getElementById('tooltip');
+                    let myVal = (p.data.value * 100).toFixed(2) + '%'
+                    let myVar = p.data.name
+                    let myNames = myVar.split('?')
+
+                    let mytext = 'Name : ' + myNames[0] + "<br>" +
+                                'Abundance : ' + myVal+ "<br>" + 
+                                'Rank : ' + myNames[1]+ "<br>" +
+                                'NCBI Taxon ID: ' + myNames[2] + "<br>"
+
+                    tooltip.innerHTML = mytext
+                    tooltip.style.left = `${event.pageX + 5}px`; // Position tooltip next to the mouse pointer
+                    tooltip.style.top = `${event.pageY + 5}px`;
+                    tooltip.style.visibility = 'visible';
+                }
+            }
+
+
+            // Function to handle mouseout event
+            function mouseout(event, p) {
+                // Get the ID of the hovered path
+                const hoveredPathId = "path-" + p.data.name;
+
+                // Select all paths with the same ID across all sunbursts
+                d3.selectAll(".sunburst-path")
+                    .filter(function(d) {
+                        // Check if the current path is the hovered path or one of its descendants
+                        return this.id === hoveredPathId || d.ancestors().some(ancestor => ancestor.data.name === p.data.name);
+                    })
+                    .style("stroke", "#fff") // Reset stroke color to white
+                    .style("stroke-width", 1); // Reset stroke width to default
+
+                                                
+                const tooltip = document.getElementById('tooltip');
+                tooltip.style.visibility = 'hidden';
+            }
+
+
+            root.each(d => d.current = d);
+
+            returnVariable()
+        });
+
+
+        function returnVariable(){
+            let files = [
+                'sampleTwoJSONFiles/ERR719231_Healthy.json',
+                'sampleTwoJSONFiles/SRR6474217_Healthy.json',
+                'sampleOneJSONFiles/ERR478967_Healthy_.json',
+                'sampleOneJSONFiles/ERR1190638_Healthy_.json',
+                'sampleOneJSONFiles/SRR341621_Healthy_.json',
+
+                'sampleTwoJSONFiles/ERR260506_Diarrhea.json',
+                'sampleTwoJSONFiles/SRR5831595_Diarrhea.json',
+                'sampleTwoJSONFiles/SRR5831603_Diarrhea.json',
+                'sampleOneJSONFiles/ERR262958_Diarrhea_.json',
+                'sampleOneJSONFiles/SRR5831593_Diarrhea_.json',
+                'sampleOneJSONFiles/ERR262943_Diarrhea_.json',
+
+                'sampleTwoJSONFiles/SRR5936079_Crohn\'s Disease.json',
+                'sampleTwoJSONFiles/SRR5950737_Crohn\'s Disease.json',
+                'sampleTwoJSONFiles/SRR5983330_Crohn\'s Disease.json',
+                'sampleOneJSONFiles/SRR1215593_Crohn\'s Disease_.json',
+                'sampleOneJSONFiles/SRR5936079_Crohn\'s Disease_.json',
+                'sampleOneJSONFiles/SRR5983386_Crohn\'s Disease_.json',
+            ];
+
+            for (let i = 0; i < 17; i++) {
+                // Using an IIFE (Immediately Invoked Function Expression) to create a closure
+                (function(index) {
+                    d3.json(files[index]).then(data => {
+                        let containers = [
+                            ".svg-container-2", ".svg-container-3", '.svg-container-4',
+                            '.svg-container-5', '.svg-container-6', '.svg-container-7',
+                            '.svg-container-8', '.svg-container-9', '.svg-container-10',
+                            '.svg-container-11', '.svg-container-12', '.svg-container-13',
+                            '.svg-container-14', '.svg-container-15', '.svg-container-16',
+                            '.svg-container-17', '.svg-container-18'
+                        ];
+
+                        const width = 1000;
+                        const radius = width / 40;
+                        const colorScale = d3.scaleOrdinal(d3.quantize(d3.interpolateRainbow, data.children.length + 1));
+
+                        const svg = d3.select(containers[index])
+                            .append("svg")
+                            .attr("width", width)
+                            .attr("height", 1000)
+                            .append("g")
+                            .attr("transform", `translate(${500},${500})`);
+
+                        const place = (files[index]).indexOf('/')
+                        const word = (files[index]).substring(place+1) 
+                        const place2 = word.indexOf('.')
+                        const word2 = word.substring(0, place2) + '['+(files[index]).substring(6,9)+']'
+
+                        svg.append("text")
+                                .attr("x", -162)
+                                .attr("y", 470)
+                                .attr("font-size", "28")
+                                .attr("fill", "black")
+                                .text(word2)
+
+                        // console.log(containers[index]);
+                        // console.log(files[index])
+
+                        const partition = d3.partition()
+                            .size([2 * Math.PI, radius]);
+
+                        const root = d3.hierarchy(data)
+                            .sum(d => d.value)
+                            .sort((a, b) => b.value - a.value);
+
+                        partition(root);
+
+                        function innerRadius(d){
+                            if (d.depth >= 9){
+                                return 346
+                            }
+                            else if (d.depth === 8){
+                                return 289
+                            }
+                            else if (d.depth === 7){
+                                return 237
+                            }
+                            else if (d.depth === 6){
+                                return 190
+                            }
+                            else if (d.depth === 5){
+                                return 148
+                            }
+                            else if (d.depth === 4){
+                                return 111
+                            }
+                            else if (d.depth === 3){
+                                return 79
+                            }
+                            else if (d.depth === 2){
+                                return 52
+                            }
+                            else if (d.depth === 1){
+                                return 30
+                            }
+                            return d.y0
+                        }
+
+                        function outerRadius(d){
+                            if (d.depth >= 9){
+                                return 410
+                            }
+                            else if (d.depth === 8){
+                                if (!d.hasOwnProperty('children')){
+                                    return 420
+                                }
+                                return 346
+                            }
+                            else if (d.depth === 7){
+                                if (!d.hasOwnProperty('children')){
+                                    return 430
+                                }
+                                return 289
+                            }
+                            else if (d.depth === 6){
+                                if (!d.hasOwnProperty('children')){
+                                    return 440
+                                }
+                                return 237
+                            }
+                            else if (d.depth === 5){
+                                if (!d.hasOwnProperty('children')){
+                                    return 450
+                                }
+                                return 190
+                            }
+                            else if (d.depth === 4){
+                                if (!d.hasOwnProperty('children')){
+                                    return 460
+                                }
+                                return 148
+                            }
+                            else if (d.depth === 3){
+                                if (!d.hasOwnProperty('children')){
+                                    return 470
+                                }
+                                return 111
+                            }
+                            else if (d.depth === 2){
+                                if (!d.hasOwnProperty('children')){
+                                    return 480
+                                }
+                                return 79
+                            }
+                            else if (d.depth === 1){
+                                if (!d.hasOwnProperty('children')){
+                                    return 490
+                                }
+                                return 52
+                            }
+                            return d.y1
+                        }
+
+                        const arc = d3.arc()
+                            .startAngle(d => d.x0)
+                            .endAngle(d => d.x1)
+                            .innerRadius(d => {
+                                return innerRadius(d)
+                            })
+                            .outerRadius(d => {
+                                return outerRadius(d)
+                            });
+
+                        function lightenColorByDegrees(rgbString, counter) {
+                            var rgbValues = rgbString.match(/\d+/g).map(Number);
+                            var basePercentage = 20;
+                            var percentIncrease = basePercentage * counter;
+                            var lightenedRgb = lightenColor(rgbValues, percentIncrease);
+                            var lightenedRgbString = "rgb(" + lightenedRgb.join(", ") + ")";
+                            return lightenedRgbString;
+                        }
+
+                        function lightenColor(rgb, percent) {
+                            var r = rgb[0];
+                            var g = rgb[1];
+                            var b = rgb[2];
+                            r = Math.min(Math.max(r + Math.round(2.55 * percent), 0), 255);
+                            g = Math.min(Math.max(g + Math.round(2.55 * percent), 0), 255);
+                            b = Math.min(Math.max(b + Math.round(2.55 * percent), 0), 255);
+                            return [r, g, b];
+                        }
+
+                        const path = svg.selectAll("path")
+                            .data(root.descendants().slice(1))
+                            .enter()
+                            .append("path")
+                            .classed("sunburst-path", true) // Add a class to each path
+                            .attr("id", (d, i) => "path-" + d.data.name) // Add a unique ID to each path
+                            .attr("d", arc)
+                            .style("stroke", "#fff")
+                            .style("stroke-width", "1")
+                            .attr("fill", d => {
+                                // console.log(colorMapping)
+                                if (d.data.name in colorMapping){
+                                    return colorMapping[d.data.name]
+                                }else{
+                                    return "black"
+                                }
+                                // console.log(original.data.name)
+                                // console.log(lightenedColor)
+                                // colorMapping[original.data.name] = lightenedColor
+                                
+                                // return lightenedColor;
+                            })
+                            .each(function(d) {
+                                d.originalStroke = "#fff"; 
+                                const pathSize = this.getTotalLength();
+                            })
+                            .on("click", click)
+                            .on("mouseover", mouseover)
+                            .on("mouseout", mouseout);
+
+
+
+                        svg.append("circle")
+                            .attr("r", radius*1.2)
+                            .attr("class", "center")
+                            .style("stroke", "black")
+                            .style("stroke-width", 2)
+                            .style("fill", "white")
+                            .on("click", () => click(null, currentParent));
+
+                    
+                        svg.append("defs")
+                        .append("pattern")
+                        .attr("id", "stripes")
+                        .attr("patternUnits", "userSpaceOnUse")
+                        .attr("width", 8)
+                        .attr("height", 8)
+                        .append("line")
+                        .attr("x1", 0)
+                        .attr("y1", 0)
+                        .attr("x2", 8)
+                        .attr("y2", 8)
+                        .attr("stroke", "red")
+                        .attr("stroke-width", 2);
+
+                        let currentParent = root;
+
+                        let stripedArc = null; // Track the currently striped arc
+                        let originalColors = {}; // Store original colors of arcs
+
+                        function click(event, p) {
+                            if (p.hasOwnProperty('children')) {
+                                currentParent = p.parent || root;
+
+                                root.each(d => d.target = {
+                                    x0: Math.max(0, Math.min(1, (d.x0 - p.x0) / (p.x1 - p.x0))) * 2 * Math.PI,
+                                    x1: Math.max(0, Math.min(1, (d.x1 - p.x0) / (p.x1 - p.x0))) * 2 * Math.PI,
+                                    y0: Math.max(0, innerRadius(d) - p.depth),
+                                    y1: Math.max(0, outerRadius(d) - p.depth)
+                                });
+
+                                const t = svg.transition().duration(750);
+
+                                path.transition(t)
+                                    .tween("data", d => {
+                                        const i = d3.interpolate(d.current, d.target);
+                                        return t => d.current = i(t);
+                                    })
+                                    .attrTween("d", d => () => arc(d.current));
+
+                                // Restore original color of the previously striped arc
+                                if (stripedArc) {
+                                    d3.select(stripedArc).attr("fill", originalColors[stripedArc.id]);
+                                }
+
+                                // Store original color of the clicked arc
+                                originalColors[event.target.id] = event.target.getAttribute("fill");
+
+                                // Apply striped pattern to the clicked arc
+                                d3.select(event.target)
+                                    .attr("fill", "url(#stripes)");
+
+                                // Update the currently striped arc
+                                stripedArc = event.target;
+                            }
+                        }
+
+                        function nameMapping(val){
+                            if (val === 's'){
+                                return "species"
+                            }
+                            else if (val === 'st'){
+                                return "strain"
+                            }
+                            else if (val === 'g'){
+                                return "genus"
+                            }
+                            else if (val === 'n'){
+                                return "no rank"
+                            }
+                            else if (val === 'f'){
+                                return "family"
+                            }
+                            else if (val === 'o'){
+                                return "order"
+                            }
+                            else if (val === 'c'){
+                                return "class"
+                            }
+                            else if (val === 'sus'){
+                                return "subspecies"
+                            }
+                            else if (val === 'cl'){
+                                return "clade"
+                            }
+                            else if (val === 'p'){
+                                return "phylum"
+                            }
+                            else if (val === 'sgr'){
+                                return "species group"
+                            }
+                            else if (val === 'set'){
+                                return "serotype"
+                            }
+                            else if (val === 'sk'){
+                                return "superkingdom"
+                            }
+                            return ""
+                        }
+
+                        
+                        function mouseover(event, p) {
+                            // Get the ID of the hovered path
+                            const hoveredPathId = "path-" + p.data.name;
+
+                            // Select all paths with the same ID across all sunbursts
+                            d3.selectAll(".sunburst-path")
+                                .filter(function(d) {
+                                    // Check if the current path is the hovered path or one of its descendants
+                                    return this.id === hoveredPathId || d.ancestors().some(ancestor => ancestor.data.name === p.data.name);
+                                })
+                                .style("stroke", "red")
+                                .style("stroke-width", 5);
+
+                                if (p.hasOwnProperty('children')){
+                                    // console.log(p)
+                                    let myVal = (p.value * 100).toFixed(2) + '%'
+                                    let myVar = p.data.name
+                                    let myNames = myVar.split("__")
+                                    let index = myVar.indexOf("_")
+                                    let substringBeforeUnderscore = ''
+                                    if (index !== -1) {
+                                        substringBeforeUnderscore = nameMapping(myVar.substring(0, index));
+                                    } 
+                                    let mytext = 'Name : ' + myNames[1] + "<br>" +
+                                                    'Abundance : ' + myVal+ "<br>" + 
+                                                    'Rank : ' + substringBeforeUnderscore + "<br>" +
+                                                    'NCBI Taxon ID: ' + myNames[2] + "<br>"
+
+                                    tooltip.innerHTML = mytext
+                                    tooltip.style.left = `${event.pageX + 5}px`; // Position tooltip next to the mouse pointer
+                                    tooltip.style.top = `${event.pageY + 5}px`;
+                                    tooltip.style.visibility = 'visible';
+                                }
+                                else{
+                                    const tooltip = document.getElementById('tooltip');
+                                    let myVal = (p.data.value * 100).toFixed(2) + '%'
+                                    let myVar = p.data.name
+                                    let myNames = myVar.split('?')
+
+                                    let mytext = 'Name : ' + myNames[0] + "<br>" +
+                                                'Abundance : ' + myVal+ "<br>" + 
+                                                'Rank : ' + myNames[1]+ "<br>" +
+                                                'NCBI Taxon ID: ' + myNames[2] + "<br>"
+
+                                    tooltip.innerHTML = mytext
+                                    tooltip.style.left = `${event.pageX + 5}px`; // Position tooltip next to the mouse pointer
+                                    tooltip.style.top = `${event.pageY + 5}px`;
+                                    tooltip.style.visibility = 'visible';
+                                }
+                        }
+
+
+                        // Function to handle mouseout event
+                        function mouseout(event, p) {
+                            // Get the ID of the hovered path
+                            const hoveredPathId = "path-" + p.data.name;
+
+                            // Select all paths with the same ID across all sunbursts
+                            d3.selectAll(".sunburst-path")
+                                .filter(function(d) {
+                                    // Check if the current path is the hovered path or one of its descendants
+                                    return this.id === hoveredPathId || d.ancestors().some(ancestor => ancestor.data.name === p.data.name);
+                                })
+                                .style("stroke", "#fff") // Reset stroke color to white
+                                .style("stroke-width", 1); // Reset stroke width to default
+
+                                                            
+                            const tooltip = document.getElementById('tooltip');
+                            tooltip.style.visibility = 'hidden';
+                        }
+
+                       
+
+                        root.each(d => d.current = d);
+                    });
+                })(i); // Pass i as the argument to the IIFE
+            }
+        }     
+
+        
+        
+    </script>
+</body>
+</html>

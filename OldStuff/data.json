@@ -1,0 +1,85 @@
+{
+    "name": "root",
+    "children": [
+        { "name": "A", "value": 100 },
+        { "name": "B", "value": 50 },
+        {
+            "name": "C",
+            "children": [
+                { "name": "D", "value": 30 },
+                { "name": "E", "value": 20 },
+                {
+                    "name": "F",
+                    "children": [
+                        { "name": "G", "value": 10 },
+                        { "name": "H", "value": 5 },
+                        { "name": "I", "value": 15 },
+                        { "name": "J", "value": 10 },
+                        {
+                            "name": "K",
+                            "children": [
+                                { "name": "L", "value": 5 },
+                                { "name": "M", "value": 5 },
+                                { "name": "N", "value": 5 },
+                                { "name": "O", "value": 5 },
+                                { "name": "P", "value": 5 }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Q",
+            "children": [
+                { "name": "R", "value": 25 },
+                { "name": "S", "value": 25 },
+                {
+                    "name": "T",
+                    "children": [
+                        { "name": "U", "value": 20 },
+                        { "name": "V", "value": 10 },
+                        { "name": "W", "value": 5 },
+                        { "name": "X", "value": 5 },
+                        {
+                            "name": "Y",
+                            "children": [
+                                { "name": "Z", "value": 5 },
+                                { "name": "AA", "value": 5 },
+                                { "name": "BB", "value": 5 },
+                                { "name": "CC", "value": 5 },
+                                { "name": "DD", "value": 5 }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "EE",
+            "children": [
+                { "name": "FF", "value": 25 },
+                { "name": "GG", "value": 25 },
+                {
+                    "name": "HH",
+                    "children": [
+                        { "name": "II", "value": 20 },
+                        { "name": "JJ", "value": 10 },
+                        { "name": "KK", "value": 5 },
+                        { "name": "LL", "value": 5 },
+                        {
+                            "name": "MM",
+                            "children": [
+                                { "name": "NN", "value": 5 },
+                                { "name": "OO", "value": 5 },
+                                { "name": "PP", "value": 5 },
+                                { "name": "QQ", "value": 5 },
+                                { "name": "RR", "value": 5 }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

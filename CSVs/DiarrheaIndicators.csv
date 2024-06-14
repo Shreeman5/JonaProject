@@ -1,0 +1,31 @@
+organism,ncbi_taxon_id,weight,feature
+Escherichia coli,562,0.2325,value
+Bilophila,35832,0.2281,value
+Escherichia,561,0.1797,novalue
+Shigella,620,0.1661,novalue
+Pseudomonadota,1224,0.1598,novalue
+Alistipes,239759,-0.1342,value
+Blautia obeum,40520,-0.1318,novalue
+Roseburia faecis,301302,-0.1194,novalue
+Parvimonas micra,33033,-0.1194,novalue
+Collinsella stercoris ,147206,0.1194,novalue
+Blautia wexlerae,418240,0.1194,novalue
+Actinomyces sp. ICM47,936548,-0.1194,novalue
+Gordonibacter pamelaeae,471189,-0.1194,novalue
+Phascolarctobacterium faecium,33025,0.1194,novalue
+Firmicutes bacterium CAG:83,1262992,-0.1194,novalue
+Mediterraneibacter gnavus,33038,0.1194,novalue
+Agathobaculum butyriciproducens,1628085,0.1194,novalue
+Intestinibacter bartlettii,261299,-0.1194,novalue
+Actinomyces oris,544580,-0.1194,novalue
+Bacteroides xylanisolvens,371601,0.1194,value
+[Clostridium] leptum,1535,-0.1194,value
+Bacteroides caccae,47678,0.1194,novalue
+Actinomyces naeslundii,1655,-0.1194,novalue
+Ruthenibacterium lactatiformans,1550024,-0.1194,novalue
+Dorea formicigenerans,39486,-0.1194,novalue
+Bifidobacterium pseudocatenulatum,28026,-0.1194,novalue
+Collinsella aerofaciens,74426,0.1194,novalue
+[Eubacterium] sulci,143393,0.1194,novalue
+Streptococcus anginosus,1328,-0.1194,novalue
+Bacteroides fragilis,817,-0.1194,value

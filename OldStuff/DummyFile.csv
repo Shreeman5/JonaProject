@@ -1,0 +1,6 @@
+run_id,ncbi_taxon_id,taxon_rank_level,relative_abundance,name,lineage,,,,,,,,,
+ERR478967,591001,strain,0.003075,BBB,A,B,C,D,F,J,N,R,V,AAA
+ERR478967,1852361,species,0.000086,CCC,A,B,C,E,H,M,Q,U,Y,
+ERR478967,55565,species,0.000198,DDD,A,B,C,E,H,M,Q,U,Z,
+ERR478967,1796610,species,0.000624,EEE,A,B,C,E,I,K,O,S,W,
+ERR478967,1628085,species,0.005796,FFF,A,B,C,D,G,L,P,T,X,

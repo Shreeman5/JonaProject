@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Sunburst for ERR262943_Diarrhea_</title>
+    <script src="https://d3js.org/d3.v6.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .label {
+            font-size: 10px;
+            text-anchor: middle;
+            pointer-events: none;
+        }
+        .tooltip {
+            position: absolute;
+            background-color: black;
+            color: white;
+            padding: 10px; /* Increased padding */
+            border-radius: 5px;
+            visibility: hidden;
+            z-index: 10;
+            pointer-events: none; /* Ensures the tooltip does not interfere with mouse events */
+            font-size: 34px; /* Increased font size */
+        }
+        .svg-container {
+            position: absolute;
+            left: 10px;
+            top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div id="tooltip" class="tooltip"></div>
+    <div class="svg-container"></div>
+    <script>
+
+        let depthStats = {}
+        let mainData
+        d3.json("allJSONfiles/allJSONsmerged.json").then(data => {
+            mainData = data
+            var width = 1500;
+            var height = 1500;
+            var radius = 100;
+
+            // Create a color scale
+            var color =  d3.scaleLinear()
+                        .domain([-22, 0]) // Input domain
+                        .range([d3.rgb("blue"), d3.rgb("red")])  // Colors from blue to red
+                        .interpolate(d3.interpolateRgb); 
+
+            const colorUnderOver = d3.scaleLinear()
+                                    .domain([0, 1]) // Input domain, you can adjust these values as needed
+                                    // .range(["white", "white"])
+                                    .range(["yellow", "green"]); // Output range, colors to interpolate between
+
+            const colorOver = d3.scaleSequential(d3.interpolatePurples)
+                                    .domain([0, 1]);
+
+            const colorUnder = d3.scaleSequential(d3.interpolateOranges)
+                                    .domain([0, 1]);
+
+
+        
+
+            // Create the SVG element
+            var svg = d3.select(".svg-container").append("svg")
+                .attr("width", width)
+                .attr("height", height)
+                .append("g")
+                .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+
+
+            const partition = d3.partition()
+                .size([2 * Math.PI, radius]);
+
+            const root = d3.hierarchy(data)
+                .sum(d => d.value)
+                .sort((a, b) => b.value - a.value);
+
+            partition(root);
+
+
+            root.each(function(d) {
+                let depth = d.depth
+                let value = d.value
+                if (!depthStats[depth]) {
+                    depthStats[depth] = { min: value, max: value };
+                } 
+                else {
+                    // Update the min and max values for this depth
+                    if (value < depthStats[depth].min) {
+                        depthStats[depth].min = value;
+                    }
+                    if (value > depthStats[depth].max) {
+                        depthStats[depth].max = value;
+                    }   
+                }
+            });
+
+            // Create an arc generator
+            var arc = d3.arc()
+                .startAngle(function(d) { 
+                    return d.x0; 
+                })
+                .endAngle(function(d) { 
+                    return d.x1; 
+                })
+                .innerRadius(function(d) { 
+                    return d.y0;
+                })
+                .outerRadius(function(d) { 
+                    let val = outerRadius(d);
+                    return d.y1
+                });
+            // console.log(obj)
+
+            // Add the arcs
+            svg.selectAll("path")
+                .data(root.descendants().slice(1))
+                .enter().append("path")
+                .classed("sunburst-path", true) // Add a class to each path
+                .attr("id", (d, i) => "path-" + d.data.name) // Add a unique ID to each path
+                .attr("d", arc)
+                .style("fill", function(d) { 
+                    
+                    let max = depthStats[d.depth].max
+                    let min = depthStats[d.depth].min
+                    let origVal = d.value
+                    let normalNumber = (origVal - min)/(max - min)
+
+                    if (normalNumber !== 0){
+                        let val = Math.log(normalNumber)/Math.log(2)
+                        return color(val)
+                    }
+                    else{
+                        return color(-22)
+                    }
+                })
+                .style("stroke", "black")
+                .style("stroke-width", "1")
+                .on("mouseover", mouseover)
+                .on("mouseout", mouseout);
+
+
+            svg.append("circle")
+                .attr("r", 30)
+                .attr("class", "center")
+                .style("stroke", "black")
+                .style("stroke-width", 2)
+                .style("fill", "white")
+
+
+            svg.append("text")
+                .attr("x", 302)
+                .attr("y", -705)
+                .attr("font-size", "28")
+                .attr("fill", "red")
+                .text("Crohn's Indicators")
+        });
+        
+    </script>
+</body>
+</html>

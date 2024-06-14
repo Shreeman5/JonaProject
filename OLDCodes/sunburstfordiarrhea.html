@@ -1,0 +1,2206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Sunburst for ERR262943_Diarrhea_</title>
+    <script src="https://d3js.org/d3.v6.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .label {
+            font-size: 10px;
+            text-anchor: middle;
+            pointer-events: none;
+        }
+        .tooltip {
+            position: absolute;
+            background-color: black;
+            color: white;
+            padding: 10px; /* Increased padding */
+            border-radius: 5px;
+            visibility: hidden;
+            z-index: 10;
+            pointer-events: none; /* Ensures the tooltip does not interfere with mouse events */
+            font-size: 34px; /* Increased font size */
+        }
+        .svg-container {
+            position: absolute;
+            left: 10px;
+            top: 10px;
+        }
+
+        .svg-container-2 {
+            position: absolute;
+            left: 1520px;
+            top: 270px;
+        }
+        .svg-container-3 {
+            position: absolute;
+            left: 2680px;
+            top: 270px;
+        }
+        .svg-container-4 {
+            position: absolute;
+            left: 3840px;
+            top: 270px;
+        }
+        .svg-container-5 {
+            position: absolute;
+            left: 5000px;
+            top: 270px;
+        }
+        .svg-container-6 {
+            position: absolute;
+            left: 6160px;
+            top: 270px;
+        }
+        .svg-container-7 {
+            position: absolute;
+            left: 360px;
+            top: 1500px;
+        }
+        .svg-container-8 {
+            position: absolute;
+            left: 1520px;
+            top: 1500px;
+        }
+        .svg-container-9 {
+            position: absolute;
+            left: 2680px;
+            top: 1500px;
+        }
+        .svg-container-10 {
+            position: absolute;
+            left: 3840px;
+            top: 1500px;
+        }
+        .svg-container-11 {
+            position: absolute;
+            left: 5000px;
+            top: 1500px;
+        }
+        .svg-container-12 {
+            position: absolute;
+            left: 6160px;
+            top: 1500px;
+        }
+        .svg-container-13 {
+            position: absolute;
+            left: 360px;
+            top: 2730px;
+        }
+        .svg-container-14 {
+            position: absolute;
+            left: 1520px;
+            top: 2730px;
+        }
+        .svg-container-15 {
+            position: absolute;
+            left: 2680px;
+            top: 2730px;
+        }
+        .svg-container-16 {
+            position: absolute;
+            left: 3840px;
+            top: 2730px;
+        }
+        .svg-container-17 {
+            position: absolute;
+            left: 5000px;
+            top: 2730px;
+        }
+        .svg-container-18 {
+            position: absolute;
+            left: 6160px;
+            top: 2730px;
+        }
+    </style>
+</head>
+<body>
+    <div id="tooltip" class="tooltip"></div>
+    <div class="svg-container"></div>
+    <div class="svg-container-2"></div>
+    <div class="svg-container-3"></div>
+    <div class="svg-container-4"></div>
+    <div class="svg-container-5"></div>
+    <div class="svg-container-6"></div>
+    <div class="svg-container-7"></div>
+    <div class="svg-container-8"></div>
+    <div class="svg-container-9"></div>
+    <div class="svg-container-10"></div>
+    <div class="svg-container-11"></div>
+    <div class="svg-container-12"></div>
+    <div class="svg-container-13"></div>
+    <div class="svg-container-14"></div>
+    <div class="svg-container-15"></div>
+    <div class="svg-container-16"></div>
+    <div class="svg-container-17"></div>
+    <div class="svg-container-18"></div>
+    <script>
+
+        let depthStats = {}
+        let mainData
+        d3.json("allJSONfiles/allJSONsmerged.json").then(data => {
+            mainData = data
+            var width = 1500;
+            var height = 1500;
+            var radius = 100;
+
+            // Create a color scale
+            var color =  d3.scaleLinear()
+                        .domain([-22, 0]) // Input domain
+                        .range([d3.rgb("blue"), d3.rgb("red")])  // Colors from blue to red
+                        .interpolate(d3.interpolateRgb); 
+
+            const colorUnderOver = d3.scaleLinear()
+                                    .domain([0, 1]) // Input domain, you can adjust these values as needed
+                                    // .range(["white", "white"])
+                                    .range(["yellow", "green"]); // Output range, colors to interpolate between
+
+
+            var interpolateGreens = d3.interpolateRgb("#6ab46b", "#002000");                       
+            
+            const colorOver = d3.scaleSequential(interpolateGreens)
+                                    .domain([0, 1]);
+
+            var interpolateYellows = d3.interpolateRgb("#ffebc2", "#8b6508");
+
+            const colorUnder = d3.scaleSequential(interpolateYellows)
+                                    .domain([0, 1]);
+
+
+
+            // var cd1 =  d3.scaleLinear()
+            //             .domain([Math.log(0.0006000000000000001)/Math.log(10), Math.log(7.442679000000001)/Math.log(10)]) // Input domain
+            //             .range([d3.rgb("blue"), d3.rgb("red")])  // Colors from blue to red
+            //             .interpolate(d3.interpolateRgb);  // Interpolator
+
+            // var cd2 =  d3.scaleLinear()
+            //             .domain([Math.log(0.000377)/Math.log(10), Math.log(7.442679000000001)/Math.log(10)]) // Input domain
+            //             .range([d3.rgb("blue"), d3.rgb("red")])  // Colors from blue to red
+            //             .interpolate(d3.interpolateRgb);  // Interpolator
+
+
+            // var cd3 =  d3.scaleLinear()
+            //             .domain([Math.log(0.000005)/Math.log(10), Math.log(7.442679000000001)/Math.log(10)]) // Input domain
+            //             .range([d3.rgb("blue"), d3.rgb("red")])  // Colors from blue to red
+            //             .interpolate(d3.interpolateRgb);  // Interpolator
+
+            // var cd4 =  d3.scaleLinear()
+            //             .domain([Math.log(0.000009)/Math.log(10), Math.log(7.442379000000001)/Math.log(10)]) // Input domain
+            //             .range([d3.rgb("blue"), d3.rgb("red")])  // Colors from blue to red
+            //             .interpolate(d3.interpolateRgb);  // Interpolator
+
+            // var cd5 =  d3.scaleLinear()
+            //             .domain([Math.log(0.000002)/Math.log(10), Math.log(7.439407000000001)/Math.log(10)]) // Input domain
+            //             .range([d3.rgb("blue"), d3.rgb("red")])  // Colors from blue to red
+            //             .interpolate(d3.interpolateRgb);  // Interpolator
+
+            // var cd6 =  d3.scaleLinear()
+            //             .domain([Math.log(0.000002)/Math.log(10), Math.log(5.1381380000000005)/Math.log(10)]) // Input domain
+            //             .range([d3.rgb("blue"), d3.rgb("red")])  // Colors from blue to red
+            //             .interpolate(d3.interpolateRgb);  // Interpolator
+
+            // var cd7 =  d3.scaleLinear()
+            //             .domain([Math.log(0.000001)/Math.log(10), Math.log(3.276667)/Math.log(10)]) // Input domain
+            //             .range([d3.rgb("blue"), d3.rgb("red")])  // Colors from blue to red
+            //             .interpolate(d3.interpolateRgb);  // Interpolator
+
+            // var cd8 =  d3.scaleLinear()
+            //             .domain([Math.log(0.000001)/Math.log(10), Math.log(0.9846579999999999)/Math.log(10)]) // Input domain
+            //             .range([d3.rgb("blue"), d3.rgb("red")])  // Colors from blue to red
+            //             .interpolate(d3.interpolateRgb);  // Interpolator
+
+            // var cd9 =  d3.scaleLinear()
+            //             .domain([Math.log(0.000005)/Math.log(10), Math.log(0.497705)/Math.log(10)]) // Input domain
+            //             .range([d3.rgb("blue"), d3.rgb("red")])  // Colors from blue to red
+            //             .interpolate(d3.interpolateRgb);  // Interpolator
+
+
+
+        
+
+            // Create the SVG element
+            var svg = d3.select(".svg-container").append("svg")
+                .attr("width", width)
+                .attr("height", height)
+                .append("g")
+                .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+
+            
+
+
+
+            // Create a partition layout
+            var partition = d3.partition()
+                .size([2 * Math.PI, radius]);
+
+
+            // Create a hierarchy from the data
+            var hierarchy = d3.hierarchy(data)
+                            .sum(function(d) { 
+                                // console.log(d)
+                                return d.value; 
+                            }) // Each element has a size of 1
+                            .sort(function(a, b) { return b.value - a.value; });
+
+            var root = partition(hierarchy);
+
+            //g__Bifidobacterium__1678
+
+            // Function to calculate total number of leaf descendants for each node
+            function calculateLeafDescendants(node) {
+                if (!node.children || node.children.length === 0) {
+                    node.totalLeafDescendants = 1; // Leaf node has 1 leaf descendant (itself)
+                } else {
+                    node.totalLeafDescendants = node.children.reduce(function(sum, child) {
+                        return sum + calculateLeafDescendants(child);
+                    }, 0);
+                }
+                return node.totalLeafDescendants;
+            }
+
+            // Calculate leaf descendants for each node starting from the root
+            calculateLeafDescendants(root);
+
+
+            root.each(function(d) {
+                if (d.children) {
+                    // Calculate the total number of leaf descendants for all children
+                    var totalLeafDescendants = d.children.reduce(function(sum, child) {
+                        return sum + child.totalLeafDescendants;
+                    }, 0);
+
+                    // Iterate over the children and assign size proportional to their leaf descendants count
+                    var currentAngle = d.x0;
+                    d.children.forEach(function(child) {
+                        var childWeight = child.totalLeafDescendants;
+                        var angleRange = (childWeight / totalLeafDescendants) * (d.x1 - d.x0);
+
+                        // Calculate the start and end angle for the child
+                        child.x0 = currentAngle;
+                        child.x1 = currentAngle + angleRange;
+
+                        // Update the current angle
+                        currentAngle += angleRange;
+                    });
+                }
+
+                let depth = d.depth
+                let value = d.value
+                if (!depthStats[depth]) {
+                    depthStats[depth] = { min: value, max: value };
+                } 
+                else {
+                    // Update the min and max values for this depth
+                    if (value < depthStats[depth].min) {
+                        depthStats[depth].min = value;
+                    }
+                    if (value > depthStats[depth].max) {
+                        depthStats[depth].max = value;
+                    }   
+                }
+            });
+            // console.log(depthStats)
+
+            function innerRadius(d){
+                if (d.depth >= 9){
+                    return 534
+                }
+                else if (d.depth === 8){
+                    return 392
+                }
+                else if (d.depth === 7){
+                    return 274
+                }
+                else if (d.depth === 6){
+                    return 180
+                }
+                else if (d.depth === 5){
+                    return 110
+                }
+                else if (d.depth === 4){
+                    return 90
+                }
+                else if (d.depth === 3){
+                    return 70
+                }
+                else if (d.depth === 2){
+                    return 50
+                }
+                else if (d.depth === 1){
+                    return 30
+                }
+                return d.y0
+            }
+
+            function outerRadius(d){
+                if ((d.data.name.includes("Escherichia coli") && d.data.name.includes("562"))
+                    || (d.data.name.includes("Bilophila") && d.data.name.includes("35832")) 
+                    || (d.data.name.includes("Escherichia") && d.data.name.includes("561"))
+                    || (d.data.name.includes("Shigella")) //&& d.data.name.includes("216851"))
+                    || (d.data.name.includes("Pseudomonadota") && d.data.name.includes("1224"))
+                    || (d.data.name.includes("Alistipes") && d.data.name.includes("239759"))
+                    || (d.data.name.includes("Blautia obeum") && d.data.name.includes("40520"))
+                    || (d.data.name.includes("Roseburia faecis") && d.data.name.includes("301302"))
+                    || (d.data.name.includes("Parvimonas micra") && d.data.name.includes("33033"))
+                    || (d.data.name.includes("Collinsella stercoris") && d.data.name.includes("147206"))
+
+                    || (d.data.name.includes("Blautia wexlerae") && d.data.name.includes("418240"))
+                    || (d.data.name.includes("Actinomyces sp. ICM47") && d.data.name.includes("936548"))
+                    || (d.data.name.includes("Gordonibacter pamelaeae") && d.data.name.includes("471189"))
+                    || (d.data.name.includes("Phascolarctobacterium faecium") && d.data.name.includes("33025"))
+                    || (d.data.name.includes("Firmicutes bacterium CAG:83") && d.data.name.includes("1262992"))
+                    || (d.data.name.includes("Mediterraneibacter gnavus") && d.data.name.includes("33038"))
+                    || (d.data.name.includes("Agathobaculum butyriciproducens") && d.data.name.includes("1628085"))
+                    || (d.data.name.includes("Intestinibacter bartlettii") && d.data.name.includes("261299"))
+                    || (d.data.name.includes("Actinomyces oris") && d.data.name.includes("544580"))
+                    || (d.data.name.includes("Bacteroides xylanisolvens") && d.data.name.includes("371601"))
+
+                    || (d.data.name.includes("[Clostridium] leptum") && d.data.name.includes("1535"))
+                    || (d.data.name.includes("Bacteroides caccae") && d.data.name.includes("47678"))
+                    || (d.data.name.includes("Actinomyces naeslundii") && d.data.name.includes("1655"))
+                    || (d.data.name.includes("Ruthenibacterium lactatiformans") && d.data.name.includes("1550024"))
+                    || (d.data.name.includes("Dorea formicigenerans") && d.data.name.includes("39486"))
+                    || (d.data.name.includes("Bifidobacterium pseudocatenulatum") && d.data.name.includes("28026"))
+                    || (d.data.name.includes("Collinsella aerofaciens") && d.data.name.includes("74426"))
+                    || (d.data.name.includes("[Eubacterium] sulci") && d.data.name.includes("143393"))
+                    || (d.data.name.includes("Streptococcus anginosus") && d.data.name.includes("1328"))
+                    || (d.data.name.includes("Bacteroides fragilis") && d.data.name.includes("817"))
+                ){
+                    return 750
+                }
+                if (d.depth >= 9){
+                    return 700
+                }
+                else if (d.depth === 8){
+                    // if (!d.hasOwnProperty('children')){
+                    //     return 750
+                    // }
+                    return 534
+                }
+                else if (d.depth === 7){
+                    // if (!d.hasOwnProperty('children')){
+                    //     return 750
+                    // }
+                    return 392
+                }
+                else if (d.depth === 6){
+                    // if (!d.hasOwnProperty('children')){
+                    //     return 750
+                    // }
+                    return 274
+                }
+                else if (d.depth === 5){
+                    // if (!d.hasOwnProperty('children')){
+                    //     return 750
+                    // }
+                    return 180
+                }
+                else if (d.depth === 4){
+                    // if (!d.hasOwnProperty('children')){
+                    //     return 750
+                    // }
+                    return 110
+                }
+                else if (d.depth === 3){
+                    // if (!d.hasOwnProperty('children')){
+                    //     return 750
+                    // }
+                    return 90
+                }
+                else if (d.depth === 2){
+                    // if (!d.hasOwnProperty('children')){
+                    //     return 750
+                    // }
+                    return 70
+                }
+                else if (d.depth === 1){
+                    // if (!d.hasOwnProperty('children')){
+                    //     return 750
+                    // }
+                    return 50
+                }
+                return d.y1
+            }
+
+
+            // Create an arc generator
+            var arc = d3.arc()
+                .startAngle(function(d) { 
+                    return d.x0; 
+                })
+                .endAngle(function(d) { 
+                    return d.x1; 
+                })
+                .innerRadius(function(d) { 
+                    let val = innerRadius(d);
+                    return val; 
+                })
+                .outerRadius(function(d) { 
+                    let val = outerRadius(d);
+                    return val; 
+                });
+            // console.log(obj)
+
+            // Add the arcs
+            svg.selectAll("path")
+                .data(root.descendants().slice(1))
+                .enter().append("path")
+                .classed("sunburst-path", true) // Add a class to each path
+                .attr("id", (d, i) => "path-" + d.data.name) // Add a unique ID to each path
+                .attr("d", arc)
+                .style("fill", function(d) { 
+
+
+                    // if (d.data.name.includes("Mediterraneibacter gnavus") && d.data.name.includes("33038")){
+                    //     let val = (0.8307 - (-0.443))/(0.8307 - (-0.443))
+                    //     return colorUnderOver(val)
+                    // }
+                    // if (d.data.name.includes("Escherichia coli") && d.data.name.includes("562")){
+                    //     let val = (0.6457 - (-0.443))/(0.8307 - (-0.443))
+                    //     return colorUnderOver(0.6457)
+                    // }
+                    // if (d.data.name.includes("Faecalibacterium prausnitzii") && d.data.name.includes("853")){
+                    //     let val = (-0.443 - (-0.443))/(0.8307 - (-0.443))
+                    //     return colorUnderOver(val)
+                    // }
+                    // if (d.data.name.includes("Faecalibacterium") && d.data.name.includes("216851")){
+                    //     let val = (-0.2962 - (-0.443))/(0.8307 - (-0.443))
+                    //     return colorUnderOver(val)
+                    // }
+                    // if (d.data.name.includes("Anaerostipes") && d.data.name.includes("207244")){
+                    //     let val = (-0.29 - (-0.443))/(0.8307 - (-0.443))
+                    //     return colorUnderOver(val)
+                    // }
+                    // if (d.data.name.includes("[Clostridium] leptum") && d.data.name.includes("1535")){
+                    //     let val = (-0.288 - (-0.443))/(0.8307 - (-0.443))
+                    //     return colorUnderOver(val)
+                    // }
+                    // if (d.data.name.includes("Christensenellaceae") && d.data.name.includes("990719")){
+                    //     let val = (-0.2697 - (-0.443))/(0.8307 - (-0.443))
+                    //     return colorUnderOver(val)
+                    // }
+                    // if (d.data.name.includes("Fusobacterium") && d.data.name.includes("848")){
+                    //     let val = (0.2697 - (-0.443))/(0.8307 - (-0.443))
+                    //     return colorUnderOver(val)
+                    // }
+                    // if (d.data.name.includes("Dialister invisus") && d.data.name.includes("218538")){
+                    //     let val = (-0.2261 - (-0.443))/(0.8307 - (-0.443))
+                    //     return colorUnderOver(val)
+                    // }
+                    // if (d.data.name.includes("Enterocloster clostridioformis") && d.data.name.includes("1531")){
+                    //     let val = (0.226 - (-0.443))/(0.8307 - (-0.443))
+                    //     return colorUnderOver(val)
+                    // }
+                    // if (d.data.name.includes("Oscillibacter") && d.data.name.includes("459786")){
+                    //     let val = (-0.2193 - (-0.443))/(0.8307 - (-0.443))
+                    //     return colorUnderOver(val)
+                    // }
+                    // if (d.data.name.includes("Roseburia hominis") && d.data.name.includes("301301")){
+                    //     let val = (-0.2192 - (-0.443))/(0.8307 - (-0.443))
+                    //     return colorUnderOver(val)
+                    // }
+                    // if (d.data.name.includes("Bacteroides uniformis") && d.data.name.includes("820")){
+                    //     let val = (-0.1793 - (-0.443))/(0.8307 - (-0.443))
+                    //     return colorUnderOver(val)
+                    // }
+                    // if (d.data.name.includes("Escherichia") && d.data.name.includes("561")){
+                    //     let val = (0.1743 - (-0.443))/(0.8307 - (-0.443))
+                    //     return colorUnderOver(val)
+                    // }
+                    // if (d.data.name.includes("Enterococcus") && d.data.name.includes("1350")){
+                    //     let val = (0.1705 - (-0.443))/(0.8307 - (-0.443))
+                    //     return colorUnderOver(val)
+                    // }
+                    // if (d.data.name.includes("Ruminococcus") && d.data.name.includes("1263")){
+                    //     let val = (-0.1649 - (-0.443))/(0.8307 - (-0.443))
+                    //     return colorUnderOver(val)
+                    // }
+                    // if (d.data.name.includes("Peptostreptococcaceae") && d.data.name.includes("186804")){
+                    //     let val = (-0.1646 - (-0.443))/(0.8307 - (-0.443))
+                    //     return colorUnderOver(val)
+                    // }
+                    // if (d.data.name.includes("Anaerostipes hadrus") && d.data.name.includes("649756")){
+                    //     let val = (-0.1639 - (-0.443))/(0.8307 - (-0.443))
+                    //     return colorUnderOver(val)
+                    // }
+                    // if (d.data.name.includes("Collinsella") && d.data.name.includes("102106")){
+                    //     let val = (-0.1522 - (-0.443))/(0.8307 - (-0.443))
+                    //     return colorUnderOver(val)
+                    // }
+                    // if (d.data.name.includes("Methanobrevibacter") && d.data.name.includes("2172")){
+                    //     let val = (-0.1522 - (-0.443))/(0.8307 - (-0.443))
+                    //     return colorUnderOver(val)
+                    // }
+                    // if (d.data.name.includes("Aggregatibacter segnis") && d.data.name.includes("739")){
+                    //     let val = (0.1481 - (-0.443))/(0.8307 - (-0.443))
+                    //     return colorUnderOver(val)
+                    // }
+                    // if (d.data.name.includes("Actinobacillus") && d.data.name.includes("713")){
+                    //     let val = (0.1481 - (-0.443))/(0.8307 - (-0.443))
+                    //     return colorUnderOver(val)
+                    // }
+                    // if (d.data.name.includes("Streptococcus anginosus") && d.data.name.includes("1328")){
+                    //     let val = (0.1481 - (-0.443))/(0.8307 - (-0.443))
+                    //     return colorUnderOver(val)
+                    // }
+                    // if (d.data.name.includes("Fusicatenibacter") && d.data.name.includes("1407607")){
+                    //     let val = (-0.1445 - (-0.443))/(0.8307 - (-0.443))
+                    //     return colorUnderOver(val)
+                    // }
+                    // if (d.data.name.includes("Fusicatenibacter saccharivorans") && d.data.name.includes("1150298")){
+                    //     let val = (-0.1417 - (-0.443))/(0.8307 - (-0.443))
+                    //     return colorUnderOver(val)
+                    // }
+                    // if (d.data.name.includes("Oscillospiraceae") && d.data.name.includes("216572")){
+                    //     let val = (-0.1347 - (-0.443))/(0.8307 - (-0.443))
+                    //     return colorUnderOver(val)
+                    // }
+                    // if (d.data.name.includes("Turicibacter") && d.data.name.includes("191303")){
+                    //     let val = (-0.1343 - (-0.443))/(0.8307 - (-0.443))
+                    //     return colorUnderOver(val)
+                    // }
+                    // if (d.data.name.includes("Gemmiger") && d.data.name.includes("204475")){
+                    //     let val = (-0.1343 - (-0.443))/(0.8307 - (-0.443))
+                    //     return colorUnderOver(val)
+                    // }
+                    // if (d.data.name.includes("Haemophilus") && d.data.name.includes("724")){
+                    //     let val = (0.1277 - (-0.443))/(0.8307 - (-0.443))
+                    //     return colorUnderOver(val)
+                    // }
+                    // if (d.data.name.includes("Parabacteroides distasonis") && d.data.name.includes("823")){
+                    //     let val = (-0.1268 - (-0.443))/(0.8307 - (-0.443))
+                    //     return colorUnderOver(val)
+                    // }
+
+
+                    if (d.data.name.includes("Escherichia coli") && d.data.name.includes("562")){
+                        let val = (0.2325 - 0.1194)/(0.2325 - 0.1194)
+                        return colorOver(val)
+                    }
+                    if (d.data.name.includes("Bilophila") && d.data.name.includes("35832")) {
+                        let val = (0.2281 - 0.1194)/(0.2325 - 0.1194)
+                        return colorOver(val)
+                    }
+                    if (d.data.name.includes("Escherichia") && d.data.name.includes("561")){
+                        let val = (0.1797 - 0.1194)/(0.2325 - 0.1194)
+                        return colorOver(val)
+                    }
+                    if (d.data.name.includes("Shigella")){
+                        let val = (0.1661 - 0.1194)/(0.2325 - 0.1194)
+                        return colorOver(val)
+                    }
+                    if (d.data.name.includes("Pseudomonadota") && d.data.name.includes("1224")){
+                        let val = (0.1598 - 0.1194)/(0.2325 - 0.1194)
+                        return colorOver(val)
+                    }
+
+
+                    if (d.data.name.includes("Alistipes") && d.data.name.includes("239759")){
+                        let val = (0.1342 - 0.1194)/(0.1342 - 0.1194)
+                        return colorUnder(val)
+                    }
+                    if (d.data.name.includes("Blautia obeum") && d.data.name.includes("40520")){
+                        let val = (0.1318 - 0.1194)/(0.1342 - 0.1194)
+                        return colorUnder(val)
+                    }
+                    if (d.data.name.includes("Roseburia faecis") && d.data.name.includes("301302")){
+                        let val = (0.1194 - 0.1194)/(0.1342 - 0.1194)
+                        return colorUnder(val)
+                    }
+                    if (d.data.name.includes("Parvimonas micra") && d.data.name.includes("33033")){
+                        let val = (0.1194 - 0.1194)/(0.1342 - 0.1194)
+                        return colorUnder(val)
+                    }
+                    if (d.data.name.includes("Collinsella stercoris") && d.data.name.includes("147206")){
+                        let val = (0.1194 - 0.1194)/(0.2325 - 0.1194)
+                        return colorOver(val)
+                    }
+
+
+                    if (d.data.name.includes("Blautia wexlerae") && d.data.name.includes("418240")){
+                        let val = (0.1194 - 0.1194)/(0.2325 - 0.1194)
+                        return colorOver(val)
+                    }
+                    if (d.data.name.includes("Actinomyces sp. ICM47") && d.data.name.includes("936548")){
+                        let val = (0.1194 - 0.1194)/(0.1342 - 0.1194)
+                        return colorUnder(val)
+                    }
+                    if (d.data.name.includes("Gordonibacter pamelaeae") && d.data.name.includes("471189")){
+                        let val = (0.1194 - 0.1194)/(0.1342 - 0.1194)
+                        return colorUnder(val)
+                    }
+                    if (d.data.name.includes("Phascolarctobacterium faecium") && d.data.name.includes("33025")){
+                        let val = (0.1194 - 0.1194)/(0.2325 - 0.1194)
+                        return colorOver(val)
+                    }
+                    if (d.data.name.includes("Firmicutes bacterium CAG:83") && d.data.name.includes("1262992")){
+                        let val = (0.1194 - 0.1194)/(0.1342 - 0.1194)
+                        return colorUnder(val)
+                    }
+
+
+                    if (d.data.name.includes("Mediterraneibacter gnavus") && d.data.name.includes("33038")){
+                        let val = (0.1194 - 0.1194)/(0.2325 - 0.1194)
+                        return colorOver(val)
+                    }
+                    if (d.data.name.includes("Agathobaculum butyriciproducens") && d.data.name.includes("1628085")){
+                        let val = (0.1194 - 0.1194)/(0.2325 - 0.1194)
+                        return colorOver(val)
+                    }
+                    if (d.data.name.includes("Intestinibacter bartlettii") && d.data.name.includes("261299")){
+                        let val = (0.1194 - 0.1194)/(0.1342 - 0.1194)
+                        return colorUnder(val)
+                    }
+                    if (d.data.name.includes("Actinomyces oris") && d.data.name.includes("544580")){
+                        let val = (0.1194 - 0.1194)/(0.1342 - 0.1194)
+                        return colorUnder(val)
+                    }
+                    if (d.data.name.includes("Bacteroides xylanisolvens") && d.data.name.includes("371601")){
+                        let val = (0.1194 - 0.1194)/(0.2325 - 0.1194)
+                        return colorOver(val)
+                    }
+
+
+
+
+                    if (d.data.name.includes("[Clostridium] leptum") && d.data.name.includes("1535")){
+                        let val = (0.1194 - 0.1194)/(0.1342 - 0.1194)
+                        return colorUnder(val)
+                    }
+                    if (d.data.name.includes("Bacteroides caccae") && d.data.name.includes("47678")){
+                        let val = (0.1194 - 0.1194)/(0.2325 - 0.1194)
+                        return colorOver(val)
+                    }
+                    if (d.data.name.includes("Actinomyces naeslundii") && d.data.name.includes("1655")){
+                        let val = (0.1194 - 0.1194)/(0.1342 - 0.1194)
+                        return colorUnder(val)
+                    }
+                    if (d.data.name.includes("Ruthenibacterium lactatiformans") && d.data.name.includes("1550024")){
+                        let val = (0.1194 - 0.1194)/(0.1342 - 0.1194)
+                        return colorUnder(val)
+                    }
+                    if (d.data.name.includes("Dorea formicigenerans") && d.data.name.includes("39486")){
+                        let val = (0.1194 - 0.1194)/(0.1342 - 0.1194)
+                        return colorUnder(val)
+                    }
+
+
+
+                    if (d.data.name.includes("Bifidobacterium pseudocatenulatum") && d.data.name.includes("28026")){
+                        let val = (0.1194 - 0.1194)/(0.1342 - 0.1194)
+                        return colorUnder(val)
+                    }
+                    if (d.data.name.includes("Collinsella aerofaciens") && d.data.name.includes("74426")){
+                        let val = (0.1194 - 0.1194)/(0.2325 - 0.1194)
+                        return colorOver(val)
+                    }
+                    if (d.data.name.includes("[Eubacterium] sulci") && d.data.name.includes("143393")){
+                        let val = (0.1194 - 0.1194)/(0.2325 - 0.1194)
+                        return colorOver(val)
+                    }
+                    if (d.data.name.includes("Streptococcus anginosus") && d.data.name.includes("1328")){
+                        let val = (0.1194 - 0.1194)/(0.1342 - 0.1194)
+                        return colorUnder(val)
+                    }
+                    if (d.data.name.includes("Bacteroides fragilis") && d.data.name.includes("817")){
+                        let val = (0.1194 - 0.1194)/(0.1342 - 0.1194)
+                        return colorUnder(val)
+                    }
+
+                    return "white"
+
+                    // let logVal = Math.log(d.value)/Math.log(10)
+                    // if (d.depth === 1){
+                    //     return cd1(logVal)
+                    // }
+                    // if (d.depth === 2){
+                    //     return cd2(logVal)
+                    // }
+                    // if (d.depth === 3){
+                    //     return cd3(logVal)
+                    // }
+                    // if (d.depth === 4){
+                    //     return cd4(logVal)
+                    // }
+                    // if (d.depth === 5){
+                    //     return cd5(logVal)
+                    // }
+                    // if (d.depth === 6){
+                    //     return cd6(logVal)
+                    // }
+                    // if (d.depth === 7){
+                    //     return cd7(logVal)
+                    // }
+                    // if (d.depth === 8){
+                    //     return cd8(logVal)
+                    // }
+                    // if (d.depth === 9){
+                    //     return cd9(logVal)
+                    // }
+                    
+                    let max = depthStats[d.depth].max
+                    let min = depthStats[d.depth].min
+                    let origVal = d.value
+                    let normalNumber = (origVal - min)/(max - min)
+
+                    if (normalNumber !== 0){
+                        let val = Math.log(normalNumber)/Math.log(2)
+                        return color(val)
+                    }
+                    else{
+                        return color(-22)
+                    }
+                })
+                .style("stroke", "black")
+                .style("stroke-width", "1")
+                .on("mouseover", mouseover)
+                .on("mouseout", mouseout);
+
+
+            svg.append("circle")
+                .attr("r", 30)
+                .attr("class", "center")
+                .style("stroke", "black")
+                .style("stroke-width", 2)
+                .style("fill", "white")
+
+
+            svg.append("text")
+                .attr("x", 302)
+                .attr("y", -705)
+                .attr("font-size", "28")
+                .attr("fill", "red")
+                .text("Diarrhea Indicators")
+
+
+            function nameMapping(val){
+                if (val === 's'){
+                    return "species"
+                }
+                else if (val === 'st'){
+                    return "strain"
+                }
+                else if (val === 'g'){
+                    return "genus"
+                }
+                else if (val === 'n'){
+                    return "no rank"
+                }
+                else if (val === 'f'){
+                    return "family"
+                }
+                else if (val === 'o'){
+                    return "order"
+                }
+                else if (val === 'c'){
+                    return "class"
+                }
+                else if (val === 'sus'){
+                    return "subspecies"
+                }
+                else if (val === 'cl'){
+                    return "clade"
+                }
+                else if (val === 'p'){
+                    return "phylum"
+                }
+                else if (val === 'sgr'){
+                    return "species group"
+                }
+                else if (val === 'set'){
+                    return "serotype"
+                }
+                else if (val === 'sk'){
+                    return "superkingdom"
+                }
+                return ""
+            }
+
+            // Function to handle mouseover event
+            function mouseover(event, p) {
+                // Get the ID of the hovered path
+                const hoveredPathId = "path-" + p.data.name;
+
+                // Select all paths with the same ID across all sunbursts
+                d3.selectAll(".sunburst-path")
+                    .filter(function(d) {
+                        // Check if the current path is the hovered path or one of its descendants
+                        return this.id === hoveredPathId 
+                        // || d.ancestors().some(ancestor => ancestor.data.name === p.data.name);
+                    })
+                    .style("stroke", "red")
+                    .style("stroke-width", 5);
+
+                if (p.hasOwnProperty('children')){
+                    // console.log(p)
+                    let myVal = (p.value * 100/ 16.959626).toFixed(6) + '%'
+                    let agVal = (p.value).toFixed(6)
+                    let myVar = p.data.name
+                    let myNames = myVar.split("__")
+                    let index = myVar.indexOf("_")
+                    let substringBeforeUnderscore = ''
+                    if (index !== -1) {
+                        substringBeforeUnderscore = nameMapping(myVar.substring(0, index));
+                    } 
+                    let mytext = 'Name : ' + myNames[1] + "<br>" +
+                                    // 'Aggregated Abundance[Across 17 datasets] : ' + agVal + "<br>" +
+                                    // 'Percentage Abundance[Across 17 datasets] : ' + myVal+ "<br>" + 
+                                    'Rank : ' + substringBeforeUnderscore + "<br>" +
+                                    'NCBI Taxon ID: ' + myNames[2] + "<br>"
+
+                    tooltip.innerHTML = mytext
+                    tooltip.style.left = `${event.pageX + 5}px`; // Position tooltip next to the mouse pointer
+                    tooltip.style.top = `${event.pageY + 5}px`;
+                    tooltip.style.visibility = 'visible';
+                }
+                else{
+                    const tooltip = document.getElementById('tooltip');
+                    let myVal = (p.data.value  * 100/ 16.959626).toFixed(6) + '%'
+                    let agVal = (p.value).toFixed(6)
+                    let myVar = p.data.name
+                    let myNames = myVar.split('?')
+
+                    let mytext = 'Name : ' + myNames[0] + "<br>" +
+                                //  'Aggregated Abundance[Across 17 datasets] : ' + agVal + "<br>" +
+                                // 'Percentage Abundance[Across 17 datasets] : ' + myVal+ "<br>" + 
+                                'Rank : ' + myNames[1]+ "<br>" +
+                                'NCBI Taxon ID: ' + myNames[2] + "<br>"
+
+                    tooltip.innerHTML = mytext
+                    tooltip.style.left = `${event.pageX + 5}px`; // Position tooltip next to the mouse pointer
+                    tooltip.style.top = `${event.pageY + 5}px`;
+                    tooltip.style.visibility = 'visible';
+                }
+            }
+
+
+            // Function to handle mouseout event
+            function mouseout(event, p) {
+                // Get the ID of the hovered path
+                const hoveredPathId = "path-" + p.data.name;
+
+                // Select all paths with the same ID across all sunbursts
+                d3.selectAll(".sunburst-path")
+                    .filter(function(d) {
+                        // Check if the current path is the hovered path or one of its descendants
+                        return this.id === hoveredPathId || d.ancestors().some(ancestor => ancestor.data.name === p.data.name);
+                    })
+                    .style("stroke", "black") // Reset stroke color to white
+                    .style("stroke-width", 1); // Reset stroke width to default
+
+                                                
+                const tooltip = document.getElementById('tooltip');
+                tooltip.style.visibility = 'hidden';
+            }
+
+            returnVariable()
+        });
+
+
+
+        function returnVariable(){
+            let files = [
+                "allJSONfiles/JSONfilespremerge/SRR1215593_Crohn's Disease_.json",
+                "allJSONfiles/JSONfilespremerge/SRR5936079_Crohn's Disease.json",         
+                "allJSONfiles/JSONfilespremerge/SRR5950737_Crohn's Disease.json",
+                "allJSONfiles/JSONfilespremerge/SRR5983330_Crohn's Disease.json",
+                "allJSONfiles/JSONfilespremerge/SRR5983386_Crohn's Disease_.json",
+                'allJSONfiles/JSONfilespremerge/ERR260506_Diarrhea.json',
+                'allJSONfiles/JSONfilespremerge/ERR262943_Diarrhea_.json',
+                'allJSONfiles/JSONfilespremerge/ERR262958_Diarrhea_.json',
+                'allJSONfiles/JSONfilespremerge/SRR5831593_Diarrhea_.json',
+                'allJSONfiles/JSONfilespremerge/SRR5831595_Diarrhea.json',
+                'allJSONfiles/JSONfilespremerge/SRR5831603_Diarrhea.json',     
+                'allJSONfiles/JSONfilespremerge/ERR478967_Healthy_.json',
+                'allJSONfiles/JSONfilespremerge/ERR719231_Healthy.json',   
+                'allJSONfiles/JSONfilespremerge/ERR1190638_Healthy_.json',         
+                'allJSONfiles/JSONfilespremerge/SRR341621_Healthy_.json',
+                'allJSONfiles/JSONfilespremerge/SRR6474217_Healthy.json',
+                'allJSONfiles/JSONfilespremerge/SRR6474279_Healthy.json',   
+            ];
+
+
+            // console.log(depthStats)
+            // console.log(arcInfo)
+            // console.log(mainData)
+           
+
+            for (let i = 0; i < 17; i++) {
+                // Using an IIFE (Immediately Invoked Function Expression) to create a closure
+                (function(index) {
+                    d3.json(files[index]).then(data => {
+                        let containers = [
+                            ".svg-container-2", ".svg-container-3", '.svg-container-4',
+                            '.svg-container-5', '.svg-container-6', '.svg-container-7',
+                            '.svg-container-8', '.svg-container-9', '.svg-container-10',
+                            '.svg-container-11', '.svg-container-12', '.svg-container-13',
+                            '.svg-container-14', '.svg-container-15', '.svg-container-16',
+                            '.svg-container-17', '.svg-container-18'
+                        ];
+
+            //             // Create a color scale
+            var color =  d3.scaleLinear()
+                        .domain([-22, 0]) // Input domain
+                        .range([d3.rgb("blue"), d3.rgb("red")])  // Colors from blue to red
+                        .interpolate(d3.interpolateRgb); 
+
+            const colorUnderOver = d3.scaleLinear()
+                        .domain([0, 1]) // Input domain, you can adjust these values as needed
+                        .range(["white", "white"])
+                        //.range(["yellow", "green"]); // Output range, colors to interpolate between
+
+            // var cd1 =  d3.scaleLinear()
+            //             .domain([Math.log(0.0006000000000000001)/Math.log(10), Math.log(7.442679000000001)/Math.log(10)]) // Input domain
+            //             .range([d3.rgb("blue"), d3.rgb("red")])  // Colors from blue to red
+            //             .interpolate(d3.interpolateRgb);  // Interpolator
+
+            // var cd2 =  d3.scaleLinear()
+            //             .domain([Math.log(0.000377)/Math.log(10), Math.log(7.442679000000001)/Math.log(10)]) // Input domain
+            //             .range([d3.rgb("blue"), d3.rgb("red")])  // Colors from blue to red
+            //             .interpolate(d3.interpolateRgb);  // Interpolator
+
+
+            // var cd3 =  d3.scaleLinear()
+            //             .domain([Math.log(0.000005)/Math.log(10), Math.log(7.442679000000001)/Math.log(10)]) // Input domain
+            //             .range([d3.rgb("blue"), d3.rgb("red")])  // Colors from blue to red
+            //             .interpolate(d3.interpolateRgb);  // Interpolator
+
+            // var cd4 =  d3.scaleLinear()
+            //             .domain([Math.log(0.000009)/Math.log(10), Math.log(7.442379000000001)/Math.log(10)]) // Input domain
+            //             .range([d3.rgb("blue"), d3.rgb("red")])  // Colors from blue to red
+            //             .interpolate(d3.interpolateRgb);  // Interpolator
+
+            // var cd5 =  d3.scaleLinear()
+            //             .domain([Math.log(0.000002)/Math.log(10), Math.log(7.439407000000001)/Math.log(10)]) // Input domain
+            //             .range([d3.rgb("blue"), d3.rgb("red")])  // Colors from blue to red
+            //             .interpolate(d3.interpolateRgb);  // Interpolator
+
+            // var cd6 =  d3.scaleLinear()
+            //             .domain([Math.log(0.000002)/Math.log(10), Math.log(5.1381380000000005)/Math.log(10)]) // Input domain
+            //             .range([d3.rgb("blue"), d3.rgb("red")])  // Colors from blue to red
+            //             .interpolate(d3.interpolateRgb);  // Interpolator
+
+            // var cd7 =  d3.scaleLinear()
+            //             .domain([Math.log(0.000001)/Math.log(10), Math.log(3.276667)/Math.log(10)]) // Input domain
+            //             .range([d3.rgb("blue"), d3.rgb("red")])  // Colors from blue to red
+            //             .interpolate(d3.interpolateRgb);  // Interpolator
+
+            // var cd8 =  d3.scaleLinear()
+            //             .domain([Math.log(0.000001)/Math.log(10), Math.log(0.9846579999999999)/Math.log(10)]) // Input domain
+            //             .range([d3.rgb("blue"), d3.rgb("red")])  // Colors from blue to red
+            //             .interpolate(d3.interpolateRgb);  // Interpolator
+
+            // var cd9 =  d3.scaleLinear()
+            //             .domain([Math.log(0.000005)/Math.log(10), Math.log(0.497705)/Math.log(10)]) // Input domain
+            //             .range([d3.rgb("blue"), d3.rgb("red")])  // Colors from blue to red
+            //             .interpolate(d3.interpolateRgb);  // Interpolator
+
+
+
+                        var width = 1150;
+                        var height = 1220;
+                        let radius = 100;
+                        // console.log(radius)
+
+                        // Create a color scale
+                        var color2 =  d3.scaleLinear()
+                            .domain([-22, 0]) // Input domain
+                            .range([d3.rgb("blue"), d3.rgb("red")])  // Colors from blue to red
+                            .interpolate(d3.interpolateRgb);  // Interpolator
+                                // .range([d3.interpolateBlues(1), d3.interpolateReds(1)])
+
+                        // Create the SVG element
+                        var svg = d3.select(containers[index]).append("svg")
+                            .attr("width", width)
+                            .attr("height", height)
+                            .append("g")
+                            .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+
+                        const word = (files[index]).slice(31, -5) 
+
+                        svg.append("text")
+                                .attr("x", -52)
+                                .attr("y", -585)
+                                .attr("font-size", "28")
+                                .attr("fill", "black")
+                                .text(word)
+
+
+                        // Create a partition layout
+                        var partition = d3.partition()
+                            .size([2 * Math.PI, radius]);
+
+
+                        // Create a hierarchy from the data
+                        var hierarchy = d3.hierarchy(mainData)
+                                        .sum(function(d) { 
+                                            // console.log(d)
+                                            return d.value; 
+                                        }) // Each element has a size of 1
+                                        .sort(function(a, b) { return b.value - a.value; });
+
+                        var root = partition(hierarchy);
+
+
+                        function calculateLeafDescendants(node) {
+                            if (!node.children || node.children.length === 0) {
+                                node.totalLeafDescendants = 1; // Leaf node has 1 leaf descendant (itself)
+                            } else {
+                                node.totalLeafDescendants = node.children.reduce(function(sum, child) {
+                                    return sum + calculateLeafDescendants(child);
+                                }, 0);
+                            }
+                            return node.totalLeafDescendants;
+                        }
+
+                        // Calculate leaf descendants for each node starting from the root
+                        calculateLeafDescendants(root);
+
+
+                        root.each(function(d) {
+                            if (d.children) {
+                                // Calculate the total number of leaf descendants for all children
+                                var totalLeafDescendants = d.children.reduce(function(sum, child) {
+                                    return sum + child.totalLeafDescendants;
+                                }, 0);
+
+                                // Iterate over the children and assign size proportional to their leaf descendants count
+                                var currentAngle = d.x0;
+                                d.children.forEach(function(child) {
+                                    var childWeight = child.totalLeafDescendants;
+                                    var angleRange = (childWeight / totalLeafDescendants) * (d.x1 - d.x0);
+
+                                    // Calculate the start and end angle for the child
+                                    child.x0 = currentAngle;
+                                    child.x1 = currentAngle + angleRange;
+
+                                    // Update the current angle
+                                    currentAngle += angleRange;
+                                });
+                            }
+
+                            let depth = d.depth
+                            let value = d.value
+                            if (!depthStats[depth]) {
+                                depthStats[depth] = { min: value, max: value };
+                            } 
+                            else {
+                                // Update the min and max values for this depth
+                                if (value < depthStats[depth].min) {
+                                    depthStats[depth].min = value;
+                                }
+                                if (value > depthStats[depth].max) {
+                                    depthStats[depth].max = value;
+                                }   
+                            }
+                        });
+
+
+                        function innerRadius(d){
+                            if (d.depth >= 9){
+                                return 418
+                            }
+                            else if (d.depth === 8){
+                                return 330
+                            }
+                            else if (d.depth === 7){
+                                return 246
+                            }
+                            else if (d.depth === 6){
+                                return 170
+                            }
+                            else if (d.depth === 5){
+                                return 110
+                            }
+                            else if (d.depth === 4){
+                                return 90
+                            }
+                            else if (d.depth === 3){
+                                return 70
+                            }
+                            else if (d.depth === 2){
+                                return 50
+                            }
+                            else if (d.depth === 1){
+                                return 30
+                            }
+                            return d.y0
+                        }
+
+                        function outerRadius(d){
+                            if ((d.data.name.includes("Escherichia coli") && d.data.name.includes("562"))
+                                || (d.data.name.includes("Bilophila") && d.data.name.includes("35832")) 
+                                || (d.data.name.includes("Escherichia") && d.data.name.includes("561"))
+                                || (d.data.name.includes("Shigella")) //&& d.data.name.includes("216851"))
+                                || (d.data.name.includes("Pseudomonadota") && d.data.name.includes("1224"))
+                                || (d.data.name.includes("Alistipes") && d.data.name.includes("239759"))
+                                || (d.data.name.includes("Blautia obeum") && d.data.name.includes("40520"))
+                                || (d.data.name.includes("Roseburia faecis") && d.data.name.includes("301302"))
+                                || (d.data.name.includes("Parvimonas micra") && d.data.name.includes("33033"))
+                                || (d.data.name.includes("Collinsella stercoris") && d.data.name.includes("147206"))
+
+                                || (d.data.name.includes("Blautia wexlerae") && d.data.name.includes("418240"))
+                                || (d.data.name.includes("Actinomyces sp. ICM47") && d.data.name.includes("936548"))
+                                || (d.data.name.includes("Gordonibacter pamelaeae") && d.data.name.includes("471189"))
+                                || (d.data.name.includes("Phascolarctobacterium faecium") && d.data.name.includes("33025"))
+                                || (d.data.name.includes("Firmicutes bacterium CAG:83") && d.data.name.includes("1262992"))
+                                || (d.data.name.includes("Mediterraneibacter gnavus") && d.data.name.includes("33038"))
+                                || (d.data.name.includes("Agathobaculum butyriciproducens") && d.data.name.includes("1628085"))
+                                || (d.data.name.includes("Intestinibacter bartlettii") && d.data.name.includes("261299"))
+                                || (d.data.name.includes("Actinomyces oris") && d.data.name.includes("544580"))
+                                || (d.data.name.includes("Bacteroides xylanisolvens") && d.data.name.includes("371601"))
+
+                                || (d.data.name.includes("[Clostridium] leptum") && d.data.name.includes("1535"))
+                                || (d.data.name.includes("Bacteroides caccae") && d.data.name.includes("47678"))
+                                || (d.data.name.includes("Actinomyces naeslundii") && d.data.name.includes("1655"))
+                                || (d.data.name.includes("Ruthenibacterium lactatiformans") && d.data.name.includes("1550024"))
+                                || (d.data.name.includes("Dorea formicigenerans") && d.data.name.includes("39486"))
+                                || (d.data.name.includes("Bifidobacterium pseudocatenulatum") && d.data.name.includes("28026"))
+                                || (d.data.name.includes("Collinsella aerofaciens") && d.data.name.includes("74426"))
+                                || (d.data.name.includes("[Eubacterium] sulci") && d.data.name.includes("143393"))
+                                || (d.data.name.includes("Streptococcus anginosus") && d.data.name.includes("1328"))
+                                || (d.data.name.includes("Bacteroides fragilis") && d.data.name.includes("817"))
+                            ){
+                                return 575
+                            }
+                            if (d.depth >= 9){
+                                return 550
+                            }
+                            else if (d.depth === 8){
+                                // if (!d.hasOwnProperty('children')){
+                                //     return 575
+                                // }
+                                return 418
+                            }
+                            else if (d.depth === 7){
+                                // if (!d.hasOwnProperty('children')){
+                                //     return 575
+                                // }
+                                return 330
+                            }
+                            else if (d.depth === 6){
+                                // if (!d.hasOwnProperty('children')){
+                                //     return 575
+                                // }
+                                return 246
+                            }
+                            else if (d.depth === 5){
+                                // if (!d.hasOwnProperty('children')){
+                                //     return 575
+                                // }
+                                return 170
+                            }
+                            else if (d.depth === 4){
+                                // if (!d.hasOwnProperty('children')){
+                                //     return 575
+                                // }
+                                return 110
+                            }
+                            else if (d.depth === 3){
+                                // if (!d.hasOwnProperty('children')){
+                                //     return 575
+                                // }
+                                return 90
+                            }
+                            else if (d.depth === 2){
+                                // if (!d.hasOwnProperty('children')){
+                                //     return 575
+                                // }
+                                return 70
+                            }
+                            else if (d.depth === 1){
+                                // if (!d.hasOwnProperty('children')){
+                                //     return 575
+                                // }
+                                return 50
+                            }
+                            return d.y1
+                        }
+
+
+                        const givenDataRoot = d3.hierarchy(data).sum(function(d) { 
+                                                                    return d.value; 
+                                                                })
+                                                                .sort(function(a, b) { return b.value - a.value; });
+
+                        //Function to find the node by name and return its value
+                        function findNodeValueByName(node, name) {
+                            //console.log(node)
+                            if (node.data.name === name) {
+                                return node.value;
+                            }
+
+                            // If the node has children, recursively search them
+                            if (node.children) {
+                                for (let child of node.children) {
+                                const value = findNodeValueByName(child, name);
+                                if (value !== undefined) {
+                                    return value;
+                                }
+                                }
+                            }
+                            return undefined;
+                        }
+
+
+                        // Create an arc generator
+                        var arc = d3.arc()
+                                .startAngle(function(d) { return d.x0; })
+                                .endAngle(function(d) { return d.x1; })
+                                .innerRadius(function(d) { return innerRadius(d) })
+                                .outerRadius(function(d) { return outerRadius(d) }); 
+
+                        var ecoli = d3.scaleLinear().domain([0.0029, 0.853256]).range(["#ffcccc", "#800000"])
+                        var bilophila = d3.scaleLinear().domain([0.00005, 0.0045000000000000005]).range(["#ffcccc", "#800000"])
+                        var escherichia = d3.scaleLinear().domain([0.0029, 0.853256]).range(["#ffcccc", "#800000"])
+                        var shigella = d3.scaleLinear().domain([0.001815, 0.698184]).range(["#ffcccc", "#800000"])
+                        var pseudomonadota = d3.scaleLinear().domain([0.000596, 0.855909]).range(["#ffcccc", "#800000"])
+                        
+                        var alistipes = d3.scaleLinear().domain([0.0003, 0.470181]).range(["#ffcccc", "#800000"])
+                        var blautia = d3.scaleLinear().domain([0.00025, 0.016947]).range(["#ffcccc", "#800000"])
+                        var roseburia = d3.scaleLinear().domain([0.0007, 0.1347]).range(["#ffcccc", "#800000"])
+                        var parvimonas = d3.scaleLinear().domain([0, 1]).range(["#ffcccc", "#800000"])
+                        var collinsella = d3.scaleLinear().domain([0, 1]).range(["#ffcccc", "#800000"])
+
+                        var wexlerae = d3.scaleLinear().domain([0.00006, 0.021713]).range(["#ffcccc", "#800000"])
+                        var ICM47 = d3.scaleLinear().domain([0, 1]).range(["#ffcccc", "#800000"])
+                        var pamelaeae = d3.scaleLinear().domain([0.0001, 0.001185]).range(["#ffcccc", "#800000"])
+                        var phascolarctobacterium = d3.scaleLinear().domain([0.0002, 0.0225]).range(["#ffcccc", "#800000"])
+                        var firmicutes = d3.scaleLinear().domain([0, 1]).range(["#ffcccc", "#800000"])
+
+                        var gnavus = d3.scaleLinear().domain([0.0004, 0.011241]).range(["#ffcccc", "#800000"])
+                        var butyriciproducens = d3.scaleLinear().domain([0.00004, 0.005796]).range(["#ffcccc", "#800000"])
+                        var bartlettii = d3.scaleLinear().domain([0.000542, 0.0029]).range(["#ffcccc", "#800000"])
+                        var oris = d3.scaleLinear().domain([0, 1]).range(["#ffcccc", "#800000"])
+                        var xylanisolvens = d3.scaleLinear().domain([0.0077, 0.104635]).range(["#ffcccc", "#800000"])
+
+                        var leptum = d3.scaleLinear().domain([0.000044, 0.002935]).range(["#ffcccc", "#800000"])
+                        var caccae = d3.scaleLinear().domain([0.003344, 0.06312]).range(["#ffcccc", "#800000"])
+                        var naeslundii = d3.scaleLinear().domain([0, 1]).range(["#ffcccc", "#800000"])
+                        var lactatiformans = d3.scaleLinear().domain([0.0004, 0.002827]).range(["#ffcccc", "#800000"])
+                        var formicigenerans = d3.scaleLinear().domain([0.000002, 0.008452]).range(["#ffcccc", "#800000"])
+
+                        var pseudocatenulatum = d3.scaleLinear().domain([0.0001, 0.01686]).range(["#ffcccc", "#800000"])
+                        var aerofaciens = d3.scaleLinear().domain([0.000192, 0.013057]).range(["#ffcccc", "#800000"])
+                        var sulci = d3.scaleLinear().domain([0, 1]).range(["#ffcccc", "#800000"])
+                        var anginosus = d3.scaleLinear().domain([0, 1]).range(["#ffcccc", "#800000"])
+                        var fragilis = d3.scaleLinear().domain([0.000224, 0.205231]).range(["#ffcccc", "#800000"])
+
+                        // Add the arcs
+                        svg.selectAll("path")
+                            .data(root.descendants().slice(1))
+                            .enter().append("path")
+                            .classed("sunburst-path", true) // Add a class to each path
+                            .attr("id", (d, i) => "path-" + d.data.name) // Add a unique ID to each path
+                            .attr("d", arc)
+                            .style("fill", function(d) { 
+
+                                const nodeName = d.data.name
+                                const nodeValue = findNodeValueByName(givenDataRoot, nodeName)
+
+
+                                    
+                                if (d.data.name.includes("Escherichia coli") && d.data.name.includes("562")){
+                                    // let val = (0.8307 - (-0.443))/(0.8307 - (-0.443))
+                                    // return colorUnderOver(val)
+                                    if (nodeValue !== undefined){
+                                        return ecoli(nodeValue)
+                                    }
+                                    else{
+                                        return "black"
+                                    }
+                                }
+                                if (d.data.name.includes("Bilophila") && d.data.name.includes("35832")) {
+                                    // let val = (0.6457 - (-0.443))/(0.8307 - (-0.443))
+                                    // return colorUnderOver(0.6457)
+                                    if (nodeValue !== undefined){
+                                        return bilophila(nodeValue)
+                                    }
+                                    else{
+                                        return "black"
+                                    }
+                                }
+                                if (d.data.name.includes("Escherichia") && d.data.name.includes("561")){
+                                    // let val = (-0.443 - (-0.443))/(0.8307 - (-0.443))
+                                    // return colorUnderOver(val)
+                                    if (nodeValue !== undefined){
+                                        return escherichia(nodeValue)
+                                    }
+                                    else{
+                                        return "black"
+                                    }
+                                }
+                                if (d.data.name.includes("Shigella")){
+                                    // let val = (-0.2962 - (-0.443))/(0.8307 - (-0.443))
+                                    // return colorUnderOver(val)
+                                    if (nodeValue !== undefined){
+                                        return shigella(nodeValue)
+                                    }
+                                    else{
+                                        return "black"
+                                    }
+                                }
+                                if (d.data.name.includes("Pseudomonadota") && d.data.name.includes("1224")){
+                                    // let val = (-0.29 - (-0.443))/(0.8307 - (-0.443))
+                                    // return colorUnderOver(val)
+                                    if (nodeValue !== undefined){
+                                        return pseudomonadota(nodeValue)
+                                    }
+                                    else{
+                                        return "black"
+                                    }
+                                }
+
+
+
+
+
+
+
+
+
+                                if (d.data.name.includes("Alistipes") && d.data.name.includes("239759")){
+                                    // let val = (-0.288 - (-0.443))/(0.8307 - (-0.443))
+                                    // return colorUnderOver(val)
+                                    if (nodeValue !== undefined){
+                                        return alistipes(nodeValue)
+                                    }
+                                    else{
+                                        return "black"
+                                    }
+                                }
+                                if (d.data.name.includes("Blautia obeum") && d.data.name.includes("40520")){
+                                    // let val = (-0.2697 - (-0.443))/(0.8307 - (-0.443))
+                                    // return colorUnderOver(val)
+                                    if (nodeValue !== undefined){
+                                        return blautia(0.5)
+                                    }
+                                    else{
+                                        return "black"
+                                    }
+                                }
+                                if (d.data.name.includes("Roseburia faecis") && d.data.name.includes("301302")){
+                                    // let val = (0.2697 - (-0.443))/(0.8307 - (-0.443))
+                                    // return colorUnderOver(val)
+                                    if (nodeValue !== undefined){
+                                        return roseburia(0.5)
+                                    }
+                                    else{
+                                        return "black"
+                                    }
+                                }
+                                if (d.data.name.includes("Parvimonas micra") && d.data.name.includes("33033")){
+                                    // let val = (-0.2261 - (-0.443))/(0.8307 - (-0.443))
+                                    // return colorUnderOver(val)
+                                    if (nodeValue !== undefined){
+                                        return parvimonas(0.5)
+                                    }
+                                    else{
+                                        return "black"
+                                    }
+                                }
+                                if (d.data.name.includes("Collinsella stercoris") && d.data.name.includes("147206")){
+                                    // let val = (0.226 - (-0.443))/(0.8307 - (-0.443))
+                                    // return colorUnderOver(val)
+                                        return "black"
+                                }
+
+
+
+
+                                if (d.data.name.includes("Blautia wexlerae") && d.data.name.includes("418240")){
+                                    // let val = (-0.2193 - (-0.443))/(0.8307 - (-0.443))
+                                    // return colorUnderOver(val)
+                                    if (nodeValue !== undefined){
+                                        return wexlerae(nodeValue)
+                                    }
+                                    else{
+                                        return "black"
+                                    }
+                                }
+                                if (d.data.name.includes("Actinomyces sp. ICM47") && d.data.name.includes("936548")){
+                                    // let val = (-0.2192 - (-0.443))/(0.8307 - (-0.443))
+                                    // return colorUnderOver(val)
+                                    if (nodeValue !== undefined){
+                                        return "black"
+                                    }
+                                }
+                                if (d.data.name.includes("Gordonibacter pamelaeae") && d.data.name.includes("471189")){
+                                    // let val = (-0.1793 - (-0.443))/(0.8307 - (-0.443))
+                                    // return colorUnderOver(val)
+                                    if (nodeValue !== undefined){
+                                        return pamelaeae(nodeValue)
+                                    }
+                                    else{
+                                        return "black"
+                                    }
+                                }
+                                if (d.data.name.includes("Phascolarctobacterium faecium") && d.data.name.includes("33025")){
+                                    // let val = (0.1743 - (-0.443))/(0.8307 - (-0.443))
+                                    // return colorUnderOver(val)
+                                    if (nodeValue !== undefined){
+                                        return phascolarctobacterium(nodeValue)
+                                    }
+                                    else{
+                                        return "black"
+                                    }
+                                }
+                                if (d.data.name.includes("Firmicutes bacterium CAG:83") && d.data.name.includes("1262992")){
+                                    // let val = (0.1705 - (-0.443))/(0.8307 - (-0.443))
+                                    // return colorUnderOver(val)
+                                    if (nodeValue !== undefined){
+                                        return "black"
+                                    }
+                                }
+
+
+
+                                if (d.data.name.includes("Mediterraneibacter gnavus") && d.data.name.includes("33038")){
+                                    // let val = (-0.1649 - (-0.443))/(0.8307 - (-0.443))
+                                    // return colorUnderOver(val)
+                                    if (nodeValue !== undefined){
+                                        return gnavus(nodeValue)
+                                    }
+                                    else{
+                                        return "black"
+                                    }
+                                }
+                                if (d.data.name.includes("Agathobaculum butyriciproducens") && d.data.name.includes("1628085")){
+                                    // let val = (-0.1646 - (-0.443))/(0.8307 - (-0.443))
+                                    // return colorUnderOver(val)
+                                    if (nodeValue !== undefined){
+                                        return butyriciproducens(nodeValue)
+                                    }
+                                    else{
+                                        return "black"
+                                    }
+                                }
+                                if (d.data.name.includes("Intestinibacter bartlettii") && d.data.name.includes("261299")){
+                                    // let val = (-0.1639 - (-0.443))/(0.8307 - (-0.443))
+                                    // return colorUnderOver(val)
+                                    if (nodeValue !== undefined){
+                                        return bartlettii(nodeValue)
+                                    }
+                                    else{
+                                        return "black"
+                                    }
+                                }
+                                if (d.data.name.includes("Actinomyces oris") && d.data.name.includes("544580")){
+                                    // let val = (-0.1522 - (-0.443))/(0.8307 - (-0.443))
+                                    // return colorUnderOver(val)
+                                    if (nodeValue !== undefined){
+                                        return oris(0.5)
+                                    }
+                                    else{
+                                        return "black"
+                                    }
+                                }
+                                if (d.data.name.includes("Bacteroides xylanisolvens") && d.data.name.includes("371601")){
+                                    // console.log(nodeValue)
+                                    // let val = (-0.1522 - (-0.443))/(0.8307 - (-0.443))
+                                    if (nodeValue !== undefined){
+                                        return xylanisolvens(nodeValue)
+                                    }
+                                    else{
+                                        return "black"
+                                    }
+                                }
+
+
+
+
+
+                                if (d.data.name.includes("[Clostridium] leptum") && d.data.name.includes("1535")){
+                                    // let val = (0.1481 - (-0.443))/(0.8307 - (-0.443))
+                                    // return colorUnderOver(val)
+                                    if (nodeValue !== undefined){
+                                        return leptum(nodeValue)
+                                    }
+                                    else{
+                                        return "black"
+                                    }
+                                }
+                                if (d.data.name.includes("Bacteroides caccae") && d.data.name.includes("47678")){
+                                    // let val = (0.1481 - (-0.443))/(0.8307 - (-0.443))
+                                    // return colorUnderOver(val)
+                                    if (nodeValue !== undefined){
+                                        return caccae(nodeValue)
+                                    }
+                                    else{
+                                        return "black"
+                                    }
+                                }
+                                if (d.data.name.includes("Actinomyces naeslundii") && d.data.name.includes("1655")){
+                                    // let val = (0.1481 - (-0.443))/(0.8307 - (-0.443))
+                                    // return colorUnderOver(val)
+                                    if (nodeValue !== undefined){
+                                        return "black"
+                                    }
+                                }
+                                if (d.data.name.includes("Ruthenibacterium lactatiformans") && d.data.name.includes("1550024")){
+                                    // let val = (-0.1445 - (-0.443))/(0.8307 - (-0.443))
+                                    // return colorUnderOver(val)
+                                    if (nodeValue !== undefined){
+                                        return lactatiformans(nodeValue)
+                                    }
+                                    else{
+                                        return "black"
+                                    }
+                                }
+                                if (d.data.name.includes("Dorea formicigenerans") && d.data.name.includes("39486")){
+                                    // let val = (-0.1417 - (-0.443))/(0.8307 - (-0.443))
+                                    // return colorUnderOver(val)
+                                    if (nodeValue !== undefined){
+                                        return formicigenerans(nodeValue)
+                                    }
+                                    else{
+                                        return "black"
+                                    }
+                                }
+
+
+
+
+                                if (d.data.name.includes("Bifidobacterium pseudocatenulatum") && d.data.name.includes("28026")){
+                                    // let val = (-0.1347 - (-0.443))/(0.8307 - (-0.443))
+                                    // return colorUnderOver(val)
+                                    if (nodeValue !== undefined){
+                                        return pseudocatenulatum(nodeValue)
+                                    }
+                                    else{
+                                        return "black"
+                                    }
+                                }
+                                if (d.data.name.includes("Collinsella aerofaciens") && d.data.name.includes("74426")){
+                                    // let val = (-0.1343 - (-0.443))/(0.8307 - (-0.443))
+                                    // return colorUnderOver(val)
+                                    if (nodeValue !== undefined){
+                                        return aerofaciens(nodeValue)
+                                    }
+                                    else{
+                                        return "black"
+                                    }
+                                }
+                                if (d.data.name.includes("[Eubacterium] sulci") && d.data.name.includes("143393")){
+                                    // let val = (-0.1343 - (-0.443))/(0.8307 - (-0.443))
+                                    // return colorUnderOver(val)
+                                    if (nodeValue !== undefined){
+                                        return "black"
+                                    }
+                                }
+                                if (d.data.name.includes("Streptococcus anginosus") && d.data.name.includes("1328")){
+                                    // let val = (0.1277 - (-0.443))/(0.8307 - (-0.443))
+                                    // return colorUnderOver(val)
+                                    if (nodeValue !== undefined){
+                                        return "black"
+                                    }
+                                }
+                                if (d.data.name.includes("Bacteroides fragilis") && d.data.name.includes("817")){
+                                    // let val = (-0.1268 - (-0.443))/(0.8307 - (-0.443))
+                                    // return colorUnderOver(val)
+                                    if (nodeValue !== undefined){
+                                        return fragilis(nodeValue)
+                                    }
+                                    else{
+                                        return "black"
+                                    }
+                                }
+
+                                return "white"
+                                
+                                // if (nodeValue !== undefined){
+                                //     // let logVal = Math.log(nodeValue)/Math.log(10)
+                                //     // if (d.depth === 1){
+                                //     //     return cd1(logVal)
+                                //     // }
+                                //     // if (d.depth === 2){
+                                //     //     return cd2(logVal)
+                                //     // }
+                                //     // if (d.depth === 3){
+                                //     //     return cd3(logVal)
+                                //     // }
+                                //     // if (d.depth === 4){
+                                //     //     return cd4(logVal)
+                                //     // }
+                                //     // if (d.depth === 5){
+                                //     //     return cd5(logVal)
+                                //     // }
+                                //     // if (d.depth === 6){
+                                //     //     return cd6(logVal)
+                                //     // }
+                                //     // if (d.depth === 7){
+                                //     //     return cd7(logVal)
+                                //     // }
+                                //     // if (d.depth === 8){
+                                //     //     return cd8(logVal)
+                                //     // }
+                                //     // if (d.depth === 9){
+                                //     //     return cd9(logVal)
+                                //     // }
+
+
+                                    
+
+                                //     return "black"
+                                    
+                                //     let max = depthStats[d.depth].max
+                                //     let min = depthStats[d.depth].min
+                                //     let origVal = nodeValue > min ? nodeValue : min
+                                //     let normalNumber = (origVal - min)/(max - min)
+                                //     if (normalNumber !== 0){
+                                //         let val = Math.log(normalNumber)/Math.log(2)
+                                //         return color2(val)
+                                //     }
+                                //     else{
+                                //         return color2(-22)
+                                //     }
+
+                                // }
+                                // else{
+                                //     return "black"
+                                // }
+                            })
+                            .style("stroke", "black")
+                            .style("stroke-width", "1")
+                            .on("mouseover", mouseover)
+                            .on("mouseout", mouseout);
+
+                        svg.append("circle")
+                            .attr("r", 30)
+                            .attr("class", "center")
+                            .style("stroke", "black")
+                            .style("stroke-width", 2)
+                            .style("fill", "white")
+
+
+
+                            function nameMapping(val){
+                                if (val === 's'){
+                                    return "species"
+                                }
+                                else if (val === 'st'){
+                                    return "strain"
+                                }
+                                else if (val === 'g'){
+                                    return "genus"
+                                }
+                                else if (val === 'n'){
+                                    return "no rank"
+                                }
+                                else if (val === 'f'){
+                                    return "family"
+                                }
+                                else if (val === 'o'){
+                                    return "order"
+                                }
+                                else if (val === 'c'){
+                                    return "class"
+                                }
+                                else if (val === 'sus'){
+                                    return "subspecies"
+                                }
+                                else if (val === 'cl'){
+                                    return "clade"
+                                }
+                                else if (val === 'p'){
+                                    return "phylum"
+                                }
+                                else if (val === 'sgr'){
+                                    return "species group"
+                                }
+                                else if (val === 'set'){
+                                    return "serotype"
+                                }
+                                else if (val === 'sk'){
+                                    return "superkingdom"
+                                }
+                                return ""
+                            }
+
+                            // Function to handle mouseover event
+                            function mouseover(event, p) {
+                                // Get the ID of the hovered path
+                                const hoveredPathId = "path-" + p.data.name;
+
+                                // Select all paths with the same ID across all sunbursts
+                                d3.selectAll(".sunburst-path")
+                                    .filter(function(d) {
+                                        // Check if the current path is the hovered path or one of its descendants
+                                        return this.id === hoveredPathId 
+                                        //|| d.ancestors().some(ancestor => ancestor.data.name === p.data.name);
+                                    })
+                                    .style("stroke", "red")
+                                    .style("stroke-width", 5);
+
+                                if (p.hasOwnProperty('children')){
+
+                                    const nodeName = p.data.name
+                                    const nodeValue = findNodeValueByName(givenDataRoot, nodeName)
+
+
+                                    let myVal
+                                    if (nodeValue !== undefined){
+                                        myVal = (nodeValue * 100).toFixed(6) + '%'
+                                    }
+                                    else{
+                                        myVal = 0 + '%'
+                                    }
+                                    let myVar = p.data.name
+                                    let myNames = myVar.split("__")
+                                    let index = myVar.indexOf("_")
+                                    let substringBeforeUnderscore = ''
+                                    if (index !== -1) {
+                                        substringBeforeUnderscore = nameMapping(myVar.substring(0, index));
+                                    } 
+                                    let mytext = 'Name : ' + myNames[1] + "<br>" +
+                                                    'Percentage Abundance[In this dataset] : ' + myVal+ "<br>" + 
+                                                    'Rank : ' + substringBeforeUnderscore + "<br>" +
+                                                    'NCBI Taxon ID: ' + myNames[2] + "<br>"
+
+                                    tooltip.innerHTML = mytext
+                                    tooltip.style.left = `${event.pageX + 5}px`; // Position tooltip next to the mouse pointer
+                                    tooltip.style.top = `${event.pageY + 5}px`;
+                                    tooltip.style.visibility = 'visible';
+                                }
+                                else{
+                                    const tooltip = document.getElementById('tooltip');
+                                    const nodeName = p.data.name
+                                    const nodeValue = findNodeValueByName(givenDataRoot, nodeName)
+                                    let myVal
+                                    if (nodeValue !== undefined){
+                                        myVal = (nodeValue * 100).toFixed(6) + '%'
+                                    }
+                                    else{
+                                        myVal = 0 + '%'
+                                    }
+
+                                    let myVar = p.data.name
+                                    let myNames = myVar.split('?')
+
+                                    let mytext = 'Name : ' + myNames[0] + "<br>" +
+                                                'Percentage Abundance[In this dataset] : ' + myVal+ "<br>" + 
+                                                'Rank : ' + myNames[1]+ "<br>" +
+                                                'NCBI Taxon ID: ' + myNames[2] + "<br>"
+
+                                    tooltip.innerHTML = mytext
+                                    tooltip.style.left = `${event.pageX + 5}px`; // Position tooltip next to the mouse pointer
+                                    tooltip.style.top = `${event.pageY + 5}px`;
+                                    tooltip.style.visibility = 'visible';
+                                }
+                            }
+
+
+                            // Function to handle mouseout event
+                            function mouseout(event, p) {
+                                // Get the ID of the hovered path
+                                const hoveredPathId = "path-" + p.data.name;
+
+                                // Select all paths with the same ID across all sunbursts
+                                d3.selectAll(".sunburst-path")
+                                    .filter(function(d) {
+                                        // Check if the current path is the hovered path or one of its descendants
+                                        return this.id === hoveredPathId || d.ancestors().some(ancestor => ancestor.data.name === p.data.name);
+                                    })
+                                    .style("stroke", "black") // Reset stroke color to white
+                                    .style("stroke-width", 1); // Reset stroke width to default
+
+                                                                
+                                const tooltip = document.getElementById('tooltip');
+                                tooltip.style.visibility = 'hidden';
+                            }
+                                
+                    });
+                })(i); // Pass i as the argument to the IIFE
+            }
+        }
+        
+
+            // for (let i = 0; i < 17; i++) {
+            //     // Using an IIFE (Immediately Invoked Function Expression) to create a closure
+            //     (function(index) {
+            //         d3.json(files[index]).then(data => {
+            //             let containers = [
+            //                 ".svg-container-2", ".svg-container-3", '.svg-container-4',
+            //                 '.svg-container-5', '.svg-container-6', '.svg-container-7',
+            //                 '.svg-container-8', '.svg-container-9', '.svg-container-10',
+            //                 '.svg-container-11', '.svg-container-12', '.svg-container-13',
+            //                 '.svg-container-14', '.svg-container-15', '.svg-container-16',
+            //                 '.svg-container-17', '.svg-container-18'
+            //             ];
+
+            //             const width = 1000;
+            //             const radius = width / 40;
+            //             const colorScale = d3.scaleOrdinal(d3.quantize(d3.interpolateRainbow, data.children.length + 1));
+
+            //             const svg = d3.select(containers[index])
+            //                 .append("svg")
+            //                 .attr("width", width)
+            //                 .attr("height", 1000)
+            //                 .append("g")
+            //                 .attr("transform", `translate(${500},${500})`);
+
+            //             const place = (files[index]).indexOf('/')
+            //             const word = (files[index]).substring(place+1) 
+            //             const place2 = word.indexOf('.')
+            //             const word2 = word.substring(0, place2) + '['+(files[index]).substring(6,9)+']'
+
+            //             svg.append("text")
+            //                     .attr("x", -162)
+            //                     .attr("y", 470)
+            //                     .attr("font-size", "28")
+            //                     .attr("fill", "black")
+            //                     .text(word2)
+
+            //             // console.log(containers[index]);
+            //             // console.log(files[index])
+
+            //             const partition = d3.partition()
+            //                 .size([2 * Math.PI, radius]);
+
+            //             const root = d3.hierarchy(data)
+            //                 .sum(d => d.value)
+            //                 .sort((a, b) => b.value - a.value);
+
+            //             partition(root);
+
+            //             function innerRadius(d){
+            //                 if (d.depth >= 9){
+            //                     return 346
+            //                 }
+            //                 else if (d.depth === 8){
+            //                     return 289
+            //                 }
+            //                 else if (d.depth === 7){
+            //                     return 237
+            //                 }
+            //                 else if (d.depth === 6){
+            //                     return 190
+            //                 }
+            //                 else if (d.depth === 5){
+            //                     return 148
+            //                 }
+            //                 else if (d.depth === 4){
+            //                     return 111
+            //                 }
+            //                 else if (d.depth === 3){
+            //                     return 79
+            //                 }
+            //                 else if (d.depth === 2){
+            //                     return 52
+            //                 }
+            //                 else if (d.depth === 1){
+            //                     return 30
+            //                 }
+            //                 return d.y0
+            //             }
+
+            //             function outerRadius(d){
+            //                 if (d.depth >= 9){
+            //                     return 410
+            //                 }
+            //                 else if (d.depth === 8){
+            //                     if (!d.hasOwnProperty('children')){
+            //                         return 420
+            //                     }
+            //                     return 346
+            //                 }
+            //                 else if (d.depth === 7){
+            //                     if (!d.hasOwnProperty('children')){
+            //                         return 430
+            //                     }
+            //                     return 289
+            //                 }
+            //                 else if (d.depth === 6){
+            //                     if (!d.hasOwnProperty('children')){
+            //                         return 440
+            //                     }
+            //                     return 237
+            //                 }
+            //                 else if (d.depth === 5){
+            //                     if (!d.hasOwnProperty('children')){
+            //                         return 450
+            //                     }
+            //                     return 190
+            //                 }
+            //                 else if (d.depth === 4){
+            //                     if (!d.hasOwnProperty('children')){
+            //                         return 460
+            //                     }
+            //                     return 148
+            //                 }
+            //                 else if (d.depth === 3){
+            //                     if (!d.hasOwnProperty('children')){
+            //                         return 470
+            //                     }
+            //                     return 111
+            //                 }
+            //                 else if (d.depth === 2){
+            //                     if (!d.hasOwnProperty('children')){
+            //                         return 480
+            //                     }
+            //                     return 79
+            //                 }
+            //                 else if (d.depth === 1){
+            //                     if (!d.hasOwnProperty('children')){
+            //                         return 490
+            //                     }
+            //                     return 52
+            //                 }
+            //                 return d.y1
+            //             }
+
+            //             const arc = d3.arc()
+            //                 .startAngle(d => d.x0)
+            //                 .endAngle(d => d.x1)
+            //                 .innerRadius(d => {
+            //                     return innerRadius(d)
+            //                 })
+            //                 .outerRadius(d => {
+            //                     return outerRadius(d)
+            //                 });
+
+            //             function lightenColorByDegrees(rgbString, counter) {
+            //                 var rgbValues = rgbString.match(/\d+/g).map(Number);
+            //                 var basePercentage = 20;
+            //                 var percentIncrease = basePercentage * counter;
+            //                 var lightenedRgb = lightenColor(rgbValues, percentIncrease);
+            //                 var lightenedRgbString = "rgb(" + lightenedRgb.join(", ") + ")";
+            //                 return lightenedRgbString;
+            //             }
+
+            //             function lightenColor(rgb, percent) {
+            //                 var r = rgb[0];
+            //                 var g = rgb[1];
+            //                 var b = rgb[2];
+            //                 r = Math.min(Math.max(r + Math.round(2.55 * percent), 0), 255);
+            //                 g = Math.min(Math.max(g + Math.round(2.55 * percent), 0), 255);
+            //                 b = Math.min(Math.max(b + Math.round(2.55 * percent), 0), 255);
+            //                 return [r, g, b];
+            //             }
+
+            //             const path = svg.selectAll("path")
+            //                 .data(root.descendants().slice(1))
+            //                 .enter()
+            //                 .append("path")
+            //                 .classed("sunburst-path", true) // Add a class to each path
+            //                 .attr("id", (d, i) => "path-" + d.data.name) // Add a unique ID to each path
+            //                 .attr("d", arc)
+            //                 .style("stroke", "#fff")
+            //                 .style("stroke-width", "1")
+            //                 .attr("fill", d => {
+            //                     // console.log(colorMapping)
+            //                     if (d.data.name in colorMapping){
+            //                         return colorMapping[d.data.name]
+            //                     }else{
+            //                         return "black"
+            //                     }
+            //                     // console.log(original.data.name)
+            //                     // console.log(lightenedColor)
+            //                     // colorMapping[original.data.name] = lightenedColor
+                                
+            //                     // return lightenedColor;
+            //                 })
+            //                 .each(function(d) {
+            //                     d.originalStroke = "#fff"; 
+            //                     const pathSize = this.getTotalLength();
+            //                 })
+            //                 .on("click", click)
+            //                 .on("mouseover", mouseover)
+            //                 .on("mouseout", mouseout);
+
+
+
+            //             svg.append("circle")
+            //                 .attr("r", radius*1.2)
+            //                 .attr("class", "center")
+            //                 .style("stroke", "black")
+            //                 .style("stroke-width", 2)
+            //                 .style("fill", "white")
+            //                 .on("click", () => click(null, currentParent));
+
+                    
+            //             svg.append("defs")
+            //             .append("pattern")
+            //             .attr("id", "stripes")
+            //             .attr("patternUnits", "userSpaceOnUse")
+            //             .attr("width", 8)
+            //             .attr("height", 8)
+            //             .append("line")
+            //             .attr("x1", 0)
+            //             .attr("y1", 0)
+            //             .attr("x2", 8)
+            //             .attr("y2", 8)
+            //             .attr("stroke", "red")
+            //             .attr("stroke-width", 2);
+
+            //             let currentParent = root;
+
+            //             let stripedArc = null; // Track the currently striped arc
+            //             let originalColors = {}; // Store original colors of arcs
+
+            //             function click(event, p) {
+            //                 if (p.hasOwnProperty('children')) {
+            //                     currentParent = p.parent || root;
+
+            //                     root.each(d => d.target = {
+            //                         x0: Math.max(0, Math.min(1, (d.x0 - p.x0) / (p.x1 - p.x0))) * 2 * Math.PI,
+            //                         x1: Math.max(0, Math.min(1, (d.x1 - p.x0) / (p.x1 - p.x0))) * 2 * Math.PI,
+            //                         y0: Math.max(0, innerRadius(d) - p.depth),
+            //                         y1: Math.max(0, outerRadius(d) - p.depth)
+            //                     });
+
+            //                     const t = svg.transition().duration(750);
+
+            //                     path.transition(t)
+            //                         .tween("data", d => {
+            //                             const i = d3.interpolate(d.current, d.target);
+            //                             return t => d.current = i(t);
+            //                         })
+            //                         .attrTween("d", d => () => arc(d.current));
+
+            //                     // Restore original color of the previously striped arc
+            //                     if (stripedArc) {
+            //                         d3.select(stripedArc).attr("fill", originalColors[stripedArc.id]);
+            //                     }
+
+            //                     // Store original color of the clicked arc
+            //                     originalColors[event.target.id] = event.target.getAttribute("fill");
+
+            //                     // Apply striped pattern to the clicked arc
+            //                     d3.select(event.target)
+            //                         .attr("fill", "url(#stripes)");
+
+            //                     // Update the currently striped arc
+            //                     stripedArc = event.target;
+            //                 }
+            //             }
+
+            //             function nameMapping(val){
+            //                 if (val === 's'){
+            //                     return "species"
+            //                 }
+            //                 else if (val === 'st'){
+            //                     return "strain"
+            //                 }
+            //                 else if (val === 'g'){
+            //                     return "genus"
+            //                 }
+            //                 else if (val === 'n'){
+            //                     return "no rank"
+            //                 }
+            //                 else if (val === 'f'){
+            //                     return "family"
+            //                 }
+            //                 else if (val === 'o'){
+            //                     return "order"
+            //                 }
+            //                 else if (val === 'c'){
+            //                     return "class"
+            //                 }
+            //                 else if (val === 'sus'){
+            //                     return "subspecies"
+            //                 }
+            //                 else if (val === 'cl'){
+            //                     return "clade"
+            //                 }
+            //                 else if (val === 'p'){
+            //                     return "phylum"
+            //                 }
+            //                 else if (val === 'sgr'){
+            //                     return "species group"
+            //                 }
+            //                 else if (val === 'set'){
+            //                     return "serotype"
+            //                 }
+            //                 else if (val === 'sk'){
+            //                     return "superkingdom"
+            //                 }
+            //                 return ""
+            //             }
+
+                        
+            //             function mouseover(event, p) {
+            //                 // Get the ID of the hovered path
+            //                 const hoveredPathId = "path-" + p.data.name;
+
+            //                 // Select all paths with the same ID across all sunbursts
+            //                 d3.selectAll(".sunburst-path")
+            //                     .filter(function(d) {
+            //                         // Check if the current path is the hovered path or one of its descendants
+            //                         return this.id === hoveredPathId || d.ancestors().some(ancestor => ancestor.data.name === p.data.name);
+            //                     })
+            //                     .style("stroke", "red")
+            //                     .style("stroke-width", 5);
+
+            //                     if (p.hasOwnProperty('children')){
+            //                         // console.log(p)
+            //                         let myVal = (p.value * 100).toFixed(2) + '%'
+            //                         let myVar = p.data.name
+            //                         let myNames = myVar.split("__")
+            //                         let index = myVar.indexOf("_")
+            //                         let substringBeforeUnderscore = ''
+            //                         if (index !== -1) {
+            //                             substringBeforeUnderscore = nameMapping(myVar.substring(0, index));
+            //                         } 
+            //                         let mytext = 'Name : ' + myNames[1] + "<br>" +
+            //                                         'Abundance : ' + myVal+ "<br>" + 
+            //                                         'Rank : ' + substringBeforeUnderscore + "<br>" +
+            //                                         'NCBI Taxon ID: ' + myNames[2] + "<br>"
+
+            //                         tooltip.innerHTML = mytext
+            //                         tooltip.style.left = `${event.pageX + 5}px`; // Position tooltip next to the mouse pointer
+            //                         tooltip.style.top = `${event.pageY + 5}px`;
+            //                         tooltip.style.visibility = 'visible';
+            //                     }
+            //                     else{
+            //                         const tooltip = document.getElementById('tooltip');
+            //                         let myVal = (p.data.value * 100).toFixed(2) + '%'
+            //                         let myVar = p.data.name
+            //                         let myNames = myVar.split('?')
+
+            //                         let mytext = 'Name : ' + myNames[0] + "<br>" +
+            //                                     'Abundance : ' + myVal+ "<br>" + 
+            //                                     'Rank : ' + myNames[1]+ "<br>" +
+            //                                     'NCBI Taxon ID: ' + myNames[2] + "<br>"
+
+            //                         tooltip.innerHTML = mytext
+            //                         tooltip.style.left = `${event.pageX + 5}px`; // Position tooltip next to the mouse pointer
+            //                         tooltip.style.top = `${event.pageY + 5}px`;
+            //                         tooltip.style.visibility = 'visible';
+            //                     }
+            //             }
+
+
+            //             // Function to handle mouseout event
+            //             function mouseout(event, p) {
+            //                 // Get the ID of the hovered path
+            //                 const hoveredPathId = "path-" + p.data.name;
+
+            //                 // Select all paths with the same ID across all sunbursts
+            //                 d3.selectAll(".sunburst-path")
+            //                     .filter(function(d) {
+            //                         // Check if the current path is the hovered path or one of its descendants
+            //                         return this.id === hoveredPathId || d.ancestors().some(ancestor => ancestor.data.name === p.data.name);
+            //                     })
+            //                     .style("stroke", "#fff") // Reset stroke color to white
+            //                     .style("stroke-width", 1); // Reset stroke width to default
+
+                                                            
+            //                 const tooltip = document.getElementById('tooltip');
+            //                 tooltip.style.visibility = 'hidden';
+            //             }
+
+                       
+
+            //             root.each(d => d.current = d);
+            //         });
+            //     })(i); // Pass i as the argument to the IIFE
+            // }
+        
+        
+    </script>
+</body>
+</html>

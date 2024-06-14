@@ -1,0 +1,110 @@
+body {
+    font-family: Arial, sans-serif;
+}
+.label {
+    font-size: 10px;
+    text-anchor: middle;
+    pointer-events: none;
+}
+.tooltip {
+    position: absolute;
+    background-color: black;
+    color: white;
+    padding: 10px; /* Increased padding */
+    border-radius: 5px;
+    visibility: hidden;
+    z-index: 10;
+    pointer-events: none; /* Ensures the tooltip does not interfere with mouse events */
+    font-size: 34px; /* Increased font size */
+}
+.svg-container {
+    position: absolute;
+    left: 10px;
+    top: 10px;
+}
+
+.svg-container-2 {
+    position: absolute;
+    left: 1520px;
+    top: 270px;
+}
+.svg-container-3 {
+    position: absolute;
+    left: 2680px;
+    top: 270px;
+}
+.svg-container-4 {
+    position: absolute;
+    left: 3840px;
+    top: 270px;
+}
+.svg-container-5 {
+    position: absolute;
+    left: 5000px;
+    top: 270px;
+}
+.svg-container-6 {
+    position: absolute;
+    left: 6160px;
+    top: 270px;
+}
+.svg-container-7 {
+    position: absolute;
+    left: 360px;
+    top: 1500px;
+}
+.svg-container-8 {
+    position: absolute;
+    left: 1520px;
+    top: 1500px;
+}
+.svg-container-9 {
+    position: absolute;
+    left: 2680px;
+    top: 1500px;
+}
+.svg-container-10 {
+    position: absolute;
+    left: 3840px;
+    top: 1500px;
+}
+.svg-container-11 {
+    position: absolute;
+    left: 5000px;
+    top: 1500px;
+}
+.svg-container-12 {
+    position: absolute;
+    left: 6160px;
+    top: 1500px;
+}
+.svg-container-13 {
+    position: absolute;
+    left: 360px;
+    top: 2730px;
+}
+.svg-container-14 {
+    position: absolute;
+    left: 1520px;
+    top: 2730px;
+}
+.svg-container-15 {
+    position: absolute;
+    left: 2680px;
+    top: 2730px;
+}
+.svg-container-16 {
+    position: absolute;
+    left: 3840px;
+    top: 2730px;
+}
+.svg-container-17 {
+    position: absolute;
+    left: 5000px;
+    top: 2730px;
+}
+.svg-container-18 {
+    position: absolute;
+    left: 6160px;
+    top: 2730px;
+}
