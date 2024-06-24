@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>D3 Dual Handle Slider</title>
+    <script src="https://d3js.org/d3.v6.min.js"></script>
+    <style>
+        .slider {
+            margin: 50px;
+        }
+        .handle {
+            fill: #666;
+            stroke: #000;
+            stroke-width: 1.25px;
+        }
+        .track, .track-inset, .track-overlay {
+            stroke-linecap: round;
+        }
+        .track {
+            stroke: #ddd;
+            stroke-width: 8px;
+        }
+        .track-inset {
+            stroke: #ddd;
+            stroke-width: 6px;
+        }
+        .track-overlay {
+            pointer-events: stroke;
+            stroke-width: 50px;
+            stroke: transparent;
+        }
+    </style>
+</head>
+<body>
+    <div class="slider"></div>
+    <script>
+        const margin = { top: 20, right: 50, bottom: 20, left: 50 };
+        const width = 800 - margin.left - margin.right;
+        const height = 300 - margin.top - margin.bottom;
+
+        const svg = d3.select('.slider').append('svg')
+            .attr('width', width + margin.left + margin.right)
+            .attr('height', height + margin.top + margin.bottom)
+            .append('g')
+            .attr('transform', `translate(${margin.left}, ${margin.top})`);
+
+        const x = d3.scaleLinear()
+            .domain([0, 100])
+            .range([0, width])
+            .clamp(true);
+
+        const slider = svg.append('g')
+            .attr('class', 'slider')
+            .attr('transform', `translate(0, ${height / 2})`);
+
+        slider.append('line')
+            .attr('class', 'track')
+            .attr('x1', x.range()[0])
+            .attr('x2', x.range()[1]);
+
+        slider.append('line')
+            .attr('class', 'track-inset')
+            .attr('x1', x.range()[0])
+            .attr('x2', x.range()[1]);
+
+        slider.append('line')
+            .attr('class', 'track-overlay')
+            .attr('x1', x.range()[0])
+            .attr('x2', x.range()[1])
+            .call(d3.drag()
+                .on('start.interrupt', () => slider.interrupt())
+                .on('start drag', function(event) {
+                    const xPos = x.invert(event.x);
+                    if (draggingMin) {
+                        minValue = Math.min(xPos, maxValue);
+                        handleMin.attr('cx', x(minValue));
+                    } else {
+                        maxValue = Math.max(xPos, minValue);
+                        handleMax.attr('cx', x(maxValue));
+                    }
+                    updateValues();
+                }));
+
+        let minValue = 20;
+        let maxValue = 80;
+        let draggingMin = true;
+
+        const handleMin = slider.append('circle')
+            .attr('class', 'handle')
+            .attr('r', 18)
+            .attr('cx', x(minValue))
+            .call(d3.drag()
+                .on('start', () => draggingMin = true)
+                .on('drag', function(event) {
+                    minValue = Math.min(x.invert(event.x), maxValue);
+                    d3.select(this).attr('cx', x(minValue));
+                    updateValues();
+                }));
+
+        const handleMax = slider.append('circle')
+            .attr('class', 'handle')
+            .attr('r', 18)
+            .attr('cx', x(maxValue))
+            .call(d3.drag()
+                .on('start', () => draggingMin = false)
+                .on('drag', function(event) {
+                    maxValue = Math.max(x.invert(event.x), minValue);
+                    d3.select(this).attr('cx', x(maxValue));
+                    updateValues();
+                }));
+
+        function updateValues() {
+            svg.selectAll('.slider-value').remove();
+
+            svg.append('text')
+                .attr('class', 'slider-value')
+                .attr('text-anchor', 'middle')
+                .attr('transform', `translate(${x(minValue)}, ${height})`)
+                .text(minValue.toFixed(2));
+
+            svg.append('text')
+                .attr('class', 'slider-value')
+                .attr('text-anchor', 'middle')
+                .attr('transform', `translate(${x(maxValue)}, ${height})`)
+                .text(maxValue.toFixed(2));
+        }
+
+        updateValues();
+
+    </script>
+</body>
+</html>

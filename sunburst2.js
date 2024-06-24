@@ -1,20 +1,20 @@
 let files = [
     "JSONswithStandardRanks/MergedJSONfile/merged_tree.json",
-    "JSONswithStandardRanks/BetterIndivJSONfiles/SRR1215593_Crohn's Disease.json",   
+    "JSONswithStandardRanks/BetterIndivJSONfiles/SRR1215593_Crohn's Disease.json", 
     "JSONswithStandardRanks/BetterIndivJSONfiles/SRR5936079_Crohn's Disease.json",
     "JSONswithStandardRanks/BetterIndivJSONfiles/SRR5950737_Crohn's Disease.json",
-    "JSONswithStandardRanks/BetterIndivJSONfiles/SRR5983330_Crohn's Disease.json",
+    "JSONswithStandardRanks/BetterIndivJSONfiles/SRR5983330_Crohn's Disease.json", 
     "JSONswithStandardRanks/BetterIndivJSONfiles/SRR5983386_Crohn's Disease.json",
     "JSONswithStandardRanks/BetterIndivJSONfiles/ERR260506_Diarrhea.json",
     "JSONswithStandardRanks/BetterIndivJSONfiles/ERR262943_Diarrhea.json",
     "JSONswithStandardRanks/BetterIndivJSONfiles/ERR262958_Diarrhea.json",
-    "JSONswithStandardRanks/BetterIndivJSONfiles/SRR5831593_Diarrhea.json",   
+    "JSONswithStandardRanks/BetterIndivJSONfiles/SRR5831593_Diarrhea.json", 
     "JSONswithStandardRanks/BetterIndivJSONfiles/SRR5831595_Diarrhea.json",
     "JSONswithStandardRanks/BetterIndivJSONfiles/SRR5831603_Diarrhea.json",
     "JSONswithStandardRanks/BetterIndivJSONfiles/ERR478967_Healthy.json",
-    "JSONswithStandardRanks/BetterIndivJSONfiles/ERR719231_Healthy.json",   
-    "JSONswithStandardRanks/BetterIndivJSONfiles/ERR1190638_Healthy.json",   
-    "JSONswithStandardRanks/BetterIndivJSONfiles/SRR341621_Healthy.json",   
+    "JSONswithStandardRanks/BetterIndivJSONfiles/ERR719231_Healthy.json",
+    "JSONswithStandardRanks/BetterIndivJSONfiles/ERR1190638_Healthy.json", 
+    "JSONswithStandardRanks/BetterIndivJSONfiles/SRR341621_Healthy.json",  
     "JSONswithStandardRanks/BetterIndivJSONfiles/SRR6474217_Healthy.json",
     "JSONswithStandardRanks/BetterIndivJSONfiles/SRR6474279_Healthy.json"
 ]
@@ -53,20 +53,20 @@ function innerRadius(d, index){
 
 
 function outerRadius(d, index, csvData){
-    let nameContainsAnyValue = csvData.find(element => {
-        return d.data.name.includes(element['organism']) && d.data.name.includes(element['ncbi_taxon_id'])
-    });
-    // console.log(csvData)
-    if (nameContainsAnyValue !== undefined){
-        if (nameContainsAnyValue['feature'] === 'value'){
-            if (d.data.hasOwnProperty('value')){
-                return index === 0 ? 750 : 575
-            }
-        }
-        else{
-            return index === 0 ? 750 : 575
-        }
-    }
+    // let nameContainsAnyValue = csvData.find(element => {
+    //     return d.data.name.includes(element['organism']) && d.data.name.includes(element['ncbi_taxon_id'])
+    // });
+    // // console.log(csvData)
+    // if (nameContainsAnyValue !== undefined){
+    //     if (nameContainsAnyValue['feature'] === 'value'){
+    //         if (d.data.hasOwnProperty('value')){
+    //             return index === 0 ? 750 : 575
+    //         }
+    //     }
+    //     else{
+    //         return index === 0 ? 750 : 575
+    //     }
+    // }
     if (d.depth === 7){
         // if (!d.hasOwnProperty('children')){
         //     return 750/575
@@ -114,7 +114,7 @@ function outerRadius(d, index, csvData){
 
 
 function findNodeValueByName(node, name) {
-    //console.log(node)
+    // console.log(node)
     if (node.data.name === name) {
         return node.value;
     }
@@ -122,10 +122,10 @@ function findNodeValueByName(node, name) {
     // If the node has children, recursively search them
     if (node.children) {
         for (let child of node.children) {
-        const value = findNodeValueByName(child, name);
-        if (value !== undefined) {
-            return value;
-        }
+            const value = findNodeValueByName(child, name);
+            if (value !== undefined) {
+                return value;
+            }
         }
     }
     return undefined;
@@ -287,7 +287,7 @@ function mouseout(event, p) {
             // Check if the current path is the hovered path or one of its descendants
             return this.id === hoveredPathId || d.ancestors().some(ancestor => ancestor.data.name === p.data.name);
         })
-        .style("stroke", "black") // Reset stroke color to white
+        .style("stroke", "grey") // Reset stroke color to white
         .style("stroke-width", 1); // Reset stroke width to default
 
                                     
@@ -302,17 +302,23 @@ function findTaxonCDFbyID(dataArray, taxonId) {
     return element ? element.CDF : 0; // Return the taxon_rank_level if found, else return null
 }
 
+function findTaxonRAbyID(dataArray, taxonId){
+    // console.log(dataArray)
+    const element = dataArray.find(item => item.ncbi_taxon_id === taxonId);
+    return element ? element.relative_abundance : 0; // Return the taxon_rank_level if found, else return null
+}
+
 
 
 
 
 (async function() {
-
-    let csvData = await d3.csv('CSVs/DiarrheaIndicators.csv');
+    let myFile = 'DiarrheaIndicators' //DiarrheaIndicators
+    let csvData = await d3.csv('CSVs/'+myFile+'.csv');
     console.log(csvData);
 
 
-    for (let i = 0; i < files.length - 17; i++) {
+    for (let i = 0; i < files.length; i++) {
         // Using an IIFE (Immediately Invoked Function Expression) to create a closure
         await (async function(index) {
             let data = await d3.json(files[index]);
@@ -360,7 +366,7 @@ function findTaxonCDFbyID(dataArray, taxonId) {
                 .attr("y", -705)
                 .attr("font-size", "38")
                 .attr("fill", "Black")
-                .text("Diarrhea Indicators")
+                .text(myFile)
             }
             else{
                 svg.append("text")
@@ -388,6 +394,8 @@ function findTaxonCDFbyID(dataArray, taxonId) {
                     return d.value; 
                 })
                 .sort(function(a, b) { return b.value - a.value; });
+
+                // console.log(hierarchy)
             }
 
             let root = partition(hierarchy);
@@ -455,11 +463,34 @@ function findTaxonCDFbyID(dataArray, taxonId) {
                 let val = outerRadius(d, index, csvData);
                 return val; 
             });
+            
 
-            const lowAbundanceLow = d3.scaleLinear().domain([0, 0.5]) .range(["#191970", "#6495ED"])
-            const lowAbundanceHigh = d3.scaleLinear().domain([0.5, 1]) .range(["#6495ED", "#87CEFA"])
-            const highAbundanceLow = d3.scaleLinear().domain([0, 0.5]) .range(["#FFA07A", "#CD5C5C"])
-            const highAbundanceHigh = d3.scaleLinear().domain([0.5, 1]) .range(["#CD5C5C", "#8B0000"])
+            
+
+            // accounting for CDF only
+
+            // const lowAbundanceLow = d3.scaleLinear().domain([0, 0.5]) .range(["#191970", "#6495ED"])
+            // const lowAbundanceHigh = d3.scaleLinear().domain([0.5, 1]) .range(["#6495ED", "#87CEFA"])
+            // const highAbundanceLow = d3.scaleLinear().domain([0, 0.5]) .range(["#FFA07A", "#CD5C5C"])
+            // const highAbundanceHigh = d3.scaleLinear().domain([0.5, 1]) .range(["#CD5C5C", "#8B0000"])
+
+            //accounting for CDF and weight -- Crohn
+            const sqrtScaleLAC = d3.scaleSqrt().domain([0.00134, 0.4431]).range([0, 1]);
+            const sqrtScaleHAC = d3.scaleSqrt().domain([0, 0.8053]).range([0,1])
+            const lowAbundanceCrohn = d3.scaleSequential(d3.interpolateBlues).domain([0, 1]);
+            const highAbundanceCrohn = d3.scaleSequential(d3.interpolateReds).domain([0, 1]);
+
+            //accounting for CDF and weight -- Diarrhea -- Linear
+            // const lowAbundanceDiarrhea = d3.scaleLinear().domain([0, 0.1342]) .range(["#87CEFA", "#191970"])
+            // const highAbundanceDiarrhea = d3.scaleLinear().domain([0, 0.2325]) .range(["#FFA07A", "#8B0000"])
+
+
+            //accounting for CDF and weight -- Diarrhea
+            const sqrtScaleLAD = d3.scaleSqrt().domain([0, 0.1342]).range([0, 1]);
+            const sqrtScaleHAD = d3.scaleSqrt().domain([0, 0.2325]).range([0,1])
+            const lowAbundanceDiarrhea = d3.scaleSequential(d3.interpolateBlues).domain([0, 1]);
+            const highAbundanceDirrahea = d3.scaleSequential(d3.interpolateReds).domain([0, 1]);
+
 
             let path
             // let currentParent
@@ -505,12 +536,73 @@ function findTaxonCDFbyID(dataArray, taxonId) {
                         return "white"
                     }
                 })
-                .style("stroke", "black")
-                .style("stroke-width", "1")
-                .on("mouseover", function (event, d){
-                    handleMouseOver(event, index, d, null, null)
-                })
-                .on("mouseout", mouseout)
+                .style("stroke", function(d){
+                    let nameContainsAnyValue = csvData.find(element => {
+                        return d.data.name.includes(element['organism']) && d.data.name.includes(element['ncbi_taxon_id'])
+                    });
+                    if (nameContainsAnyValue !== undefined){
+                        if (nameContainsAnyValue['feature'] === 'value'){
+                            if (d.data.hasOwnProperty('children')){
+                                return "grey"
+                            }
+                            else if (d.data.hasOwnProperty('value')){
+                                return "black"
+                            }
+                        }
+                        else{
+                            return "black"
+                        }
+                    }
+                    else{
+                        return "grey"
+                    }
+                })         
+                .style("opacity", function(d){
+                    let nameContainsAnyValue = csvData.find(element => {
+                        return d.data.name.includes(element['organism']) && d.data.name.includes(element['ncbi_taxon_id'])
+                    });
+                    if (nameContainsAnyValue !== undefined){
+                        if (nameContainsAnyValue['feature'] === 'value'){
+                            if (d.data.hasOwnProperty('children')){
+                                return "0.1"
+                            }
+                            else if (d.data.hasOwnProperty('value')){
+                                return "1"
+                            }
+                        }
+                        else{
+                            return "1"
+                        }
+                    }
+                    else{
+                        return "0.1"
+                    }
+                })  
+                .style("stroke-width", function(d){
+                    let nameContainsAnyValue = csvData.find(element => {
+                        return d.data.name.includes(element['organism']) && d.data.name.includes(element['ncbi_taxon_id'])
+                    });
+                    if (nameContainsAnyValue !== undefined){
+                        if (nameContainsAnyValue['feature'] === 'value'){
+                            if (d.data.hasOwnProperty('children')){
+                                return "1"
+                            }
+                            else if (d.data.hasOwnProperty('value')){
+                                return "1"
+                            }
+                        }
+                        else{
+                            return "1"
+                        }
+                    }
+                    else{
+                        return "1"
+                    }
+                })  
+                // .on("mouseover", function (event, d){
+                //     handleMouseOver(event, index, d, null, null)
+                // })
+                // .on("mouseout", mouseout)
                 // .on("click", click)
 
                 svg.append("circle")
@@ -529,7 +621,8 @@ function findTaxonCDFbyID(dataArray, taxonId) {
 
                 async function preLoadData(){
                     let aggregatedData = await d3.csv("CSVs/initialCSVs/AggregateFiles/"+word+"_aggregate.csv");
-                    return aggregatedData;
+                    let agg2Data = await d3.csv("CSVs/CSVswithStandardRanks/"+word+".csv");
+                    return [aggregatedData, agg2Data];
                 }
 
                 preLoadData().then(aggregatedData => {
@@ -540,6 +633,8 @@ function findTaxonCDFbyID(dataArray, taxonId) {
                         .attr("id", (d, i) => "path-" + d.data.name) // Add a unique ID to each path
                         .attr("d", arc)
                         .style("fill", function(d) { 
+
+
                             let pathString = "path-" + d.data.name
                             let pathElement = document.getElementById(pathString)
 
@@ -547,7 +642,6 @@ function findTaxonCDFbyID(dataArray, taxonId) {
                             if (computedStyle.fill !== 'rgb(255, 255, 255)'){
                                 // console.log(computedStyle.fill)
                                 let nodeName = d.data.name
-                                // console.log(d.data.name)
                                 let taxonID
                                 if (d.data.hasOwnProperty('children')){
                                     let lastIndex = nodeName.lastIndexOf('__')
@@ -558,37 +652,137 @@ function findTaxonCDFbyID(dataArray, taxonId) {
                                     taxonID = nodeName.substring(lastIndex + 1)
                                 }
 
-                                let cdf = findTaxonCDFbyID(aggregatedData, taxonID)
+                                let cdf = findTaxonCDFbyID(aggregatedData[0], taxonID)
                                 // console.log(cdf)
+                                let nameContainsAnyValue = csvData.find(element => {
+                                    return d.data.name.includes(element['organism']) && d.data.name.includes(element['ncbi_taxon_id'])
+                                });
+                                // console.log(nameContainsAnyValue)
+                                // console.log(nameContainsAnyValue.weight)
+                                // console.log('Val: ', cdf * nameContainsAnyValue.weight)
+                                // if (nameContainsAnyValue.weight > 0){
+                                // }
+                                // else{
+                                // }
 
                                 if (computedStyle.fill === 'rgb(205, 92, 92)'){
-                                    if (cdf >= 0.5){
-                                        return highAbundanceHigh(cdf)
-                                    }
-                                    else{
-                                        return highAbundanceLow(cdf)
-                                    }
+                                    let colorVal = cdf * nameContainsAnyValue.weight
+                                    // console.log('X:', cdf)
+                                    // console.log('Y:', d.data)
+                                    // console.log('Z:', nameContainsAnyValue.weight)
+                                    // console.log('A: ', cdf * nameContainsAnyValue.weight)
+                                    // console.log('------------')
+
+                                    // if (colorVal >= 0.40265){
+                                    //     return highAbundanceHigh(colorVal)
+                                    // }
+                                    // else{
+                                    //     return highAbundanceLow(colorVal)
+                                    // }
+                                    return highAbundanceDirrahea(sqrtScaleHAD(colorVal))
+
+                                    // return highAbundanceCrohn(sqrtScaleHAC(colorVal))
+                                    // return highAbundanceDiarrhea(colorVal)
                                 }
                                 else{
-                                    if (cdf >= 0.5){
-                                        return lowAbundanceHigh(cdf)
-                                    }
-                                    else{
-                                        return lowAbundanceLow(cdf)
-                                    }
+                                    
+                                    // console.log('X:', cdf)
+                                    // console.log('Y:', d.data)
+                                    // console.log('Z:', nameContainsAnyValue.weight)
+                                    // console.log('B: ', (1 - cdf) * nameContainsAnyValue.weight * -1)
+                                    // console.log('X:', 1 - cdf)
+                                    // console.log('Y:', d.data)
+                                    // console.log('Z:', nameContainsAnyValue.weight)
+                                    // console.log('B: ', (1 - cdf) * nameContainsAnyValue.weight * -1)
+                                    // console.log('------------')
+
+                                    // if (cdf >= 0.5){
+                                    //     return lowAbundanceHigh(cdf)
+                                    // }
+                                    // else{
+                                    //     return lowAbundanceLow(cdf)
+                                    // }
+                                    let colorVal = (1 - cdf) * nameContainsAnyValue.weight * -1
+                                    return lowAbundanceDiarrhea(sqrtScaleLAD(colorVal))
+
+                                    // return lowAbundanceCrohn(sqrtScaleLAC(colorVal))
+                                    // return lowAbundanceDiarrhea(colorVal)
+
                                 }
                             }
                             else{
+                                // let nodeName = d.data.name
+                                // let taxonID
+                                // if (d.data.hasOwnProperty('children')){
+                                //     let lastIndex = nodeName.lastIndexOf('__')
+                                //     taxonID = nodeName.substring(lastIndex + 2)
+                                // }
+                                // else{
+                                //     let lastIndex = nodeName.lastIndexOf('?')
+                                //     taxonID = nodeName.substring(lastIndex + 1)
+                                // }
+                                // // console.log(data)
+                                // let rabundance = findTaxonRAbyID(aggregatedData[1], taxonID)
+                                
+                                
+                                // if (rabundance === 0){
+                                //     // console.log('zero')
+                                //     return "black"
+                                // }
+                                // else{
+                                //     // console.log('yes')
+                                    
+                                //     console.log('ID:', taxonID)
+                                //     console.log('Abundance:', rabundance)
+                                //     return "white"
+                                // }
                                 return "white"
+                                // console.log(d.data.name)
                             }
                         })
-                        .style("stroke", "black")
-                        .style("stroke-width", "1")
-                        .on("mouseover", function (event, d){
-                            let nodeName = d.data.name
-                            handleMouseOver(event, index, d, givenDataRoot, nodeName)
+                        .style("stroke", function(d){
+                            let pathString = "path-" + d.data.name
+                            let pathElement = document.getElementById(pathString)
+                            let computedStyle = window.getComputedStyle(pathElement)
+                            if (computedStyle.fill !== 'rgb(255, 255, 255)'){
+                                return "black"
+                            }
+                            else{
+                                return "grey"
+                            }
                         })
-                        .on("mouseout", mouseout);
+                        .style("opacity", function(d){
+                            let pathString = "path-" + d.data.name
+                            let pathElement = document.getElementById(pathString)
+                            let computedStyle = window.getComputedStyle(pathElement)
+                            if (computedStyle.fill !== 'rgb(255, 255, 255)'){
+                                return "1"
+                            }
+                            else{
+                                return "0.1"
+                            }
+                        }) 
+                        .style("stroke-width", "1")
+                        // .on("mouseover", function (event, d){
+                        //     let nodeName = d.data.name
+                        //     handleMouseOver(event, index, d, givenDataRoot, nodeName)
+                        // })
+                        // .on("mouseout", mouseout);
+
+
+                        // hierarchy.sort(function(a, b) {
+                        //     let pathString = "path-" + a.data.name
+                        //     let pathElement = document.getElementById(pathString)
+                        //     let computedStyle = window.getComputedStyle(pathElement)
+                        //     console.log(computedStyle.fill)
+                        //     let pathString2 = "path-" + b.data.name
+                        //     let pathElement2 = document.getElementById(pathString2)
+                        //     let computedStyle2 = window.getComputedStyle(pathElement2)
+                        //     console.log(computedStyle2.fill)
+                        //     if (aColor === 'rgb(255, 255, 255)' && bColor !== 'rgb(255, 255, 255)') return 1;
+                        //     if (aColor !== 'rgb(255, 255, 255)' && bColor === 'rgb(255, 255, 255)') return -1;
+                        //     return 0;
+                        // });
                 })
 
                 

@@ -108,3 +108,31 @@ body {
     left: 6160px;
     top: 2730px;
 }
+
+.slider {
+    /* margin: 50px; */
+    position: absolute;
+    left:1520px;
+    top:20px;
+}
+.handle {
+    fill: #666;
+    stroke: #000;
+    stroke-width: 1.25px;
+}
+.track, .track-inset, .track-overlay {
+    stroke-linecap: round;
+}
+.track {
+    stroke: #ddd;
+    stroke-width: 8px;
+}
+.track-inset {
+    stroke: #ddd;
+    stroke-width: 6px;
+}
+.track-overlay {
+    pointer-events: stroke;
+    stroke-width: 50px;
+    stroke: transparent;
+}
